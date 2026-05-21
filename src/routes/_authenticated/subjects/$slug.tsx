@@ -1,0 +1,57 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { ChevronRight } from "lucide-react";
+
+type Subject = { id: string; name: string; slug: string; color: string; description: string | null };
+type Topic = { id: string; name: string; slug: string; syllabus_ref: string | null; position: number };
+
+export const Route = createFileRoute("/_authenticated/subjects/$slug")({
+  component: SubjectPage,
+});
+
+function SubjectPage() {
+  const { slug } = Route.useParams();
+  const [subject, setSubject] = useState<Subject | null>(null);
+  const [topics, setTopics] = useState<Topic[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data: s } = await supabase.from("subjects").select("*").eq("slug", slug).maybeSingle();
+      if (!s) throw notFound();
+      setSubject(s as Subject);
+      const { data: t } = await supabase.from("topics").select("*").eq("subject_id", (s as Subject).id).order("position");
+      setTopics((t as Topic[]) || []);
+    })();
+  }, [slug]);
+
+  if (!subject) return <div className="p-8">Loading…</div>;
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+      <Link to="/subjects" className="text-sm text-muted-foreground hover:text-foreground">← All subjects</Link>
+      <div className="flex items-center gap-3 mt-2 mb-2">
+        <div className="size-12 rounded-lg grid place-items-center font-bold text-xl" style={{ backgroundColor: subject.color + "22", color: subject.color }}>{subject.name[0]}</div>
+        <h1 className="text-3xl font-bold tracking-tight">{subject.name}</h1>
+      </div>
+      <p className="text-muted-foreground mb-8">{subject.description}</p>
+
+      <div className="space-y-2">
+        {topics.map((t) => (
+          <Link
+            key={t.id}
+            to="/topic/$topicId"
+            params={{ topicId: t.id }}
+            className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 hover:border-primary/40 transition"
+          >
+            <div>
+              <div className="font-medium">{t.name}</div>
+              {t.syllabus_ref && <div className="text-xs text-muted-foreground">{t.syllabus_ref}</div>}
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
