@@ -14,7 +14,456 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attempt_answers: {
+        Row: {
+          ai_feedback: string | null
+          attempt_id: string
+          correct: boolean | null
+          created_at: string
+          id: string
+          question_id: string | null
+          question_prompt: string
+          score: number | null
+          user_answer: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          attempt_id: string
+          correct?: boolean | null
+          created_at?: string
+          id?: string
+          question_id?: string | null
+          question_prompt: string
+          score?: number | null
+          user_answer?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          attempt_id?: string
+          correct?: boolean | null
+          created_at?: string
+          id?: string
+          question_id?: string | null
+          question_prompt?: string
+          score?: number | null
+          user_answer?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempt_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attempt_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flashcards: {
+        Row: {
+          back: string
+          created_at: string
+          due_at: string
+          ease: number
+          front: string
+          id: string
+          interval_days: number
+          lapses: number
+          last_reviewed_at: string | null
+          reps: number
+          topic_id: string
+          user_id: string
+        }
+        Insert: {
+          back: string
+          created_at?: string
+          due_at?: string
+          ease?: number
+          front: string
+          id?: string
+          interval_days?: number
+          lapses?: number
+          last_reviewed_at?: string | null
+          reps?: number
+          topic_id: string
+          user_id: string
+        }
+        Update: {
+          back?: string
+          created_at?: string
+          due_at?: string
+          ease?: number
+          front?: string
+          id?: string
+          interval_days?: number
+          lapses?: number
+          last_reviewed_at?: string | null
+          reps?: number
+          topic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          exam_boards: Database["public"]["Enums"]["exam_board"][]
+          id: string
+          onboarded: boolean
+          selected_subjects: string[]
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          exam_boards?: Database["public"]["Enums"]["exam_board"][]
+          id: string
+          onboarded?: boolean
+          selected_subjects?: string[]
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          exam_boards?: Database["public"]["Enums"]["exam_board"][]
+          id?: string
+          onboarded?: boolean
+          selected_subjects?: string[]
+        }
+        Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          duration_seconds: number | null
+          finished_at: string | null
+          id: string
+          mode: string
+          score: number
+          started_at: string
+          subject_id: string | null
+          topic_id: string | null
+          total: number
+          user_id: string
+        }
+        Insert: {
+          duration_seconds?: number | null
+          finished_at?: string | null
+          id?: string
+          mode?: string
+          score?: number
+          started_at?: string
+          subject_id?: string | null
+          topic_id?: string | null
+          total?: number
+          user_id: string
+        }
+        Update: {
+          duration_seconds?: number | null
+          finished_at?: string | null
+          id?: string
+          mode?: string
+          score?: number
+          started_at?: string
+          subject_id?: string | null
+          topic_id?: string | null
+          total?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          answer: string
+          board: Database["public"]["Enums"]["exam_board"]
+          choices: Json | null
+          created_at: string
+          difficulty: number
+          explanation: string | null
+          id: string
+          prompt: string
+          topic_id: string
+          type: Database["public"]["Enums"]["question_type"]
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          board?: Database["public"]["Enums"]["exam_board"]
+          choices?: Json | null
+          created_at?: string
+          difficulty?: number
+          explanation?: string | null
+          id?: string
+          prompt: string
+          topic_id: string
+          type: Database["public"]["Enums"]["question_type"]
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          board?: Database["public"]["Enums"]["exam_board"]
+          choices?: Json | null
+          created_at?: string
+          difficulty?: number
+          explanation?: string | null
+          id?: string
+          prompt?: string
+          topic_id?: string
+          type?: Database["public"]["Enums"]["question_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_sessions: {
+        Row: {
+          activity: string
+          created_at: string
+          id: string
+          minutes: number
+          occurred_on: string
+          subject_id: string | null
+          topic_id: string | null
+          user_id: string
+        }
+        Insert: {
+          activity: string
+          created_at?: string
+          id?: string
+          minutes?: number
+          occurred_on?: string
+          subject_id?: string | null
+          topic_id?: string | null
+          user_id: string
+        }
+        Update: {
+          activity?: string
+          created_at?: string
+          id?: string
+          minutes?: number
+          occurred_on?: string
+          subject_id?: string | null
+          topic_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_sessions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          board: Database["public"]["Enums"]["exam_board"]
+          color: string
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          board?: Database["public"]["Enums"]["exam_board"]
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          board?: Database["public"]["Enums"]["exam_board"]
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          position: number
+          slug: string
+          subject_id: string
+          syllabus_ref: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          position?: number
+          slug: string
+          subject_id: string
+          syllabus_ref?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          position?: number
+          slug?: string
+          subject_id?: string
+          syllabus_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "topics_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tutor_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          subject_id: string | null
+          title: string
+          topic_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          subject_id?: string | null
+          title?: string
+          topic_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          subject_id?: string | null
+          title?: string
+          topic_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tutor_conversations_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tutor_conversations_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tutor_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tutor_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "tutor_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +472,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      exam_board: "cambridge" | "edexcel" | "both"
+      question_type: "mcq" | "short"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +600,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      exam_board: ["cambridge", "edexcel", "both"],
+      question_type: ["mcq", "short"],
+    },
   },
 } as const
