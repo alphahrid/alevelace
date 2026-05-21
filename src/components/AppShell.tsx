@@ -1,0 +1,71 @@
+import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles } from "lucide-react";
+import { signOut } from "@/lib/auth";
+import { cn } from "@/lib/utils";
+
+const nav = [
+  { to: "/dashboard", label: "Dashboard", icon: Home },
+  { to: "/subjects", label: "Subjects", icon: BookOpen },
+  { to: "/settings", label: "Settings", icon: Settings },
+];
+
+export function AppShell() {
+  const loc = useLocation();
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen flex bg-background">
+      <aside className="hidden md:flex w-60 flex-col border-r bg-sidebar text-sidebar-foreground">
+        <div className="px-6 py-5 flex items-center gap-2 border-b border-sidebar-border">
+          <div className="size-8 rounded-lg bg-primary text-primary-foreground grid place-items-center">
+            <GraduationCap className="size-5" />
+          </div>
+          <div>
+            <div className="font-semibold tracking-tight">A-Level Ace</div>
+            <div className="text-xs text-muted-foreground">Master every subject</div>
+          </div>
+        </div>
+        <nav className="flex-1 p-3 space-y-1">
+          {nav.map((n) => {
+            const active = loc.pathname.startsWith(n.to);
+            return (
+              <Link
+                key={n.to}
+                to={n.to}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                  active
+                    ? "bg-sidebar-accent text-accent-foreground font-medium"
+                    : "hover:bg-sidebar-accent/60 text-sidebar-foreground/80"
+                )}
+              >
+                <n.icon className="size-4" />
+                {n.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="p-3 border-t border-sidebar-border space-y-2">
+          <div className="rounded-md bg-accent/50 p-3 text-xs text-accent-foreground">
+            <div className="flex items-center gap-1 font-medium mb-1">
+              <Sparkles className="size-3" /> AI Tutor
+            </div>
+            Ask any question from any topic. Worked solutions for maths included.
+          </div>
+          <button
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/" });
+            }}
+            className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/60"
+          >
+            <LogOut className="size-4" /> Sign out
+          </button>
+        </div>
+      </aside>
+      <main className="flex-1 min-w-0">
+        <Outlet />
+      </main>
+    </div>
+  );
+}

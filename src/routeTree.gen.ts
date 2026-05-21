@@ -9,38 +9,231 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTutorRouteImport } from './routes/api/tutor'
+import { Route as AuthenticatedSubjectsRouteImport } from './routes/_authenticated/subjects'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedTopicTopicIdRouteImport } from './routes/_authenticated/topic/$topicId'
+import { Route as AuthenticatedSubjectsSlugRouteImport } from './routes/_authenticated/subjects/$slug'
+import { Route as AuthenticatedTopicTopicIdTutorRouteImport } from './routes/_authenticated/topic/$topicId/tutor'
+import { Route as AuthenticatedTopicTopicIdQuizRouteImport } from './routes/_authenticated/topic/$topicId/quiz'
+import { Route as AuthenticatedTopicTopicIdCardsRouteImport } from './routes/_authenticated/topic/$topicId/cards'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTutorRoute = ApiTutorRouteImport.update({
+  id: '/api/tutor',
+  path: '/api/tutor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSubjectsRoute = AuthenticatedSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTopicTopicIdRoute =
+  AuthenticatedTopicTopicIdRouteImport.update({
+    id: '/topic/$topicId',
+    path: '/topic/$topicId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSubjectsSlugRoute =
+  AuthenticatedSubjectsSlugRouteImport.update({
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => AuthenticatedSubjectsRoute,
+  } as any)
+const AuthenticatedTopicTopicIdTutorRoute =
+  AuthenticatedTopicTopicIdTutorRouteImport.update({
+    id: '/tutor',
+    path: '/tutor',
+    getParentRoute: () => AuthenticatedTopicTopicIdRoute,
+  } as any)
+const AuthenticatedTopicTopicIdQuizRoute =
+  AuthenticatedTopicTopicIdQuizRouteImport.update({
+    id: '/quiz',
+    path: '/quiz',
+    getParentRoute: () => AuthenticatedTopicTopicIdRoute,
+  } as any)
+const AuthenticatedTopicTopicIdCardsRoute =
+  AuthenticatedTopicTopicIdCardsRouteImport.update({
+    id: '/cards',
+    path: '/cards',
+    getParentRoute: () => AuthenticatedTopicTopicIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/signup': typeof SignupRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
+  '/api/tutor': typeof ApiTutorRoute
+  '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
+  '/topic/$topicId': typeof AuthenticatedTopicTopicIdRouteWithChildren
+  '/topic/$topicId/cards': typeof AuthenticatedTopicTopicIdCardsRoute
+  '/topic/$topicId/quiz': typeof AuthenticatedTopicTopicIdQuizRoute
+  '/topic/$topicId/tutor': typeof AuthenticatedTopicTopicIdTutorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/signup': typeof SignupRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
+  '/api/tutor': typeof ApiTutorRoute
+  '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
+  '/topic/$topicId': typeof AuthenticatedTopicTopicIdRouteWithChildren
+  '/topic/$topicId/cards': typeof AuthenticatedTopicTopicIdCardsRoute
+  '/topic/$topicId/quiz': typeof AuthenticatedTopicTopicIdQuizRoute
+  '/topic/$topicId/tutor': typeof AuthenticatedTopicTopicIdTutorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/signup': typeof SignupRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/subjects': typeof AuthenticatedSubjectsRouteWithChildren
+  '/api/tutor': typeof ApiTutorRoute
+  '/_authenticated/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
+  '/_authenticated/topic/$topicId': typeof AuthenticatedTopicTopicIdRouteWithChildren
+  '/_authenticated/topic/$topicId/cards': typeof AuthenticatedTopicTopicIdCardsRoute
+  '/_authenticated/topic/$topicId/quiz': typeof AuthenticatedTopicTopicIdQuizRoute
+  '/_authenticated/topic/$topicId/tutor': typeof AuthenticatedTopicTopicIdTutorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
+    | '/dashboard'
+    | '/settings'
+    | '/subjects'
+    | '/api/tutor'
+    | '/subjects/$slug'
+    | '/topic/$topicId'
+    | '/topic/$topicId/cards'
+    | '/topic/$topicId/quiz'
+    | '/topic/$topicId/tutor'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
+    | '/dashboard'
+    | '/settings'
+    | '/subjects'
+    | '/api/tutor'
+    | '/subjects/$slug'
+    | '/topic/$topicId'
+    | '/topic/$topicId/cards'
+    | '/topic/$topicId/quiz'
+    | '/topic/$topicId/tutor'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/settings'
+    | '/_authenticated/subjects'
+    | '/api/tutor'
+    | '/_authenticated/subjects/$slug'
+    | '/_authenticated/topic/$topicId'
+    | '/_authenticated/topic/$topicId/cards'
+    | '/_authenticated/topic/$topicId/quiz'
+    | '/_authenticated/topic/$topicId/tutor'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
+  SignupRoute: typeof SignupRoute
+  ApiTutorRoute: typeof ApiTutorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +241,129 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tutor': {
+      id: '/api/tutor'
+      path: '/api/tutor'
+      fullPath: '/api/tutor'
+      preLoaderRoute: typeof ApiTutorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/subjects': {
+      id: '/_authenticated/subjects'
+      path: '/subjects'
+      fullPath: '/subjects'
+      preLoaderRoute: typeof AuthenticatedSubjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/topic/$topicId': {
+      id: '/_authenticated/topic/$topicId'
+      path: '/topic/$topicId'
+      fullPath: '/topic/$topicId'
+      preLoaderRoute: typeof AuthenticatedTopicTopicIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/subjects/$slug': {
+      id: '/_authenticated/subjects/$slug'
+      path: '/$slug'
+      fullPath: '/subjects/$slug'
+      preLoaderRoute: typeof AuthenticatedSubjectsSlugRouteImport
+      parentRoute: typeof AuthenticatedSubjectsRoute
+    }
+    '/_authenticated/topic/$topicId/tutor': {
+      id: '/_authenticated/topic/$topicId/tutor'
+      path: '/tutor'
+      fullPath: '/topic/$topicId/tutor'
+      preLoaderRoute: typeof AuthenticatedTopicTopicIdTutorRouteImport
+      parentRoute: typeof AuthenticatedTopicTopicIdRoute
+    }
+    '/_authenticated/topic/$topicId/quiz': {
+      id: '/_authenticated/topic/$topicId/quiz'
+      path: '/quiz'
+      fullPath: '/topic/$topicId/quiz'
+      preLoaderRoute: typeof AuthenticatedTopicTopicIdQuizRouteImport
+      parentRoute: typeof AuthenticatedTopicTopicIdRoute
+    }
+    '/_authenticated/topic/$topicId/cards': {
+      id: '/_authenticated/topic/$topicId/cards'
+      path: '/cards'
+      fullPath: '/topic/$topicId/cards'
+      preLoaderRoute: typeof AuthenticatedTopicTopicIdCardsRouteImport
+      parentRoute: typeof AuthenticatedTopicTopicIdRoute
+    }
   }
 }
 
+interface AuthenticatedSubjectsRouteChildren {
+  AuthenticatedSubjectsSlugRoute: typeof AuthenticatedSubjectsSlugRoute
+}
+
+const AuthenticatedSubjectsRouteChildren: AuthenticatedSubjectsRouteChildren = {
+  AuthenticatedSubjectsSlugRoute: AuthenticatedSubjectsSlugRoute,
+}
+
+const AuthenticatedSubjectsRouteWithChildren =
+  AuthenticatedSubjectsRoute._addFileChildren(
+    AuthenticatedSubjectsRouteChildren,
+  )
+
+interface AuthenticatedTopicTopicIdRouteChildren {
+  AuthenticatedTopicTopicIdCardsRoute: typeof AuthenticatedTopicTopicIdCardsRoute
+  AuthenticatedTopicTopicIdQuizRoute: typeof AuthenticatedTopicTopicIdQuizRoute
+  AuthenticatedTopicTopicIdTutorRoute: typeof AuthenticatedTopicTopicIdTutorRoute
+}
+
+const AuthenticatedTopicTopicIdRouteChildren: AuthenticatedTopicTopicIdRouteChildren =
+  {
+    AuthenticatedTopicTopicIdCardsRoute: AuthenticatedTopicTopicIdCardsRoute,
+    AuthenticatedTopicTopicIdQuizRoute: AuthenticatedTopicTopicIdQuizRoute,
+    AuthenticatedTopicTopicIdTutorRoute: AuthenticatedTopicTopicIdTutorRoute,
+  }
+
+const AuthenticatedTopicTopicIdRouteWithChildren =
+  AuthenticatedTopicTopicIdRoute._addFileChildren(
+    AuthenticatedTopicTopicIdRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSubjectsRoute: typeof AuthenticatedSubjectsRouteWithChildren
+  AuthenticatedTopicTopicIdRoute: typeof AuthenticatedTopicTopicIdRouteWithChildren
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSubjectsRoute: AuthenticatedSubjectsRouteWithChildren,
+  AuthenticatedTopicTopicIdRoute: AuthenticatedTopicTopicIdRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
+  SignupRoute: SignupRoute,
+  ApiTutorRoute: ApiTutorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
