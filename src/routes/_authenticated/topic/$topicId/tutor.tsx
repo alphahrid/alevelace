@@ -59,7 +59,7 @@ function Tutor() {
           .select("role, content")
           .eq("conversation_id", convId)
           .order("created_at", { ascending: true });
-        setMessages(((msgs as Msg[]) || []).filter((m) => m.role !== "system" as const));
+        setMessages((((msgs as unknown) as Msg[]) || []).filter((m) => m.role === "user" || m.role === "assistant"));
       }
     })();
   }, [topicId]);
