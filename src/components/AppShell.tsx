@@ -1,11 +1,14 @@
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles } from "lucide-react";
+import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles, Timer } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { DonationButton } from "@/components/DonationModal";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
   { to: "/subjects", label: "Subjects", icon: BookOpen },
+  { to: "/mock", label: "Mock exams", icon: Timer },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -14,7 +17,7 @@ export function AppShell() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-background text-foreground">
       <aside className="hidden md:flex w-60 flex-col border-r bg-sidebar text-sidebar-foreground">
         <div className="px-6 py-5 flex items-center gap-2 border-b border-sidebar-border">
           <div className="size-8 rounded-lg bg-primary text-primary-foreground grid place-items-center">
@@ -27,7 +30,7 @@ export function AppShell() {
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {nav.map((n) => {
-            const active = loc.pathname.startsWith(n.to);
+            const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
             return (
               <Link
                 key={n.to}
@@ -52,19 +55,47 @@ export function AppShell() {
             </div>
             Ask any question from any topic. Worked solutions for maths included.
           </div>
+          <div className="flex items-center gap-1">
+            <DonationButton />
+            <ThemeToggle />
+          </div>
           <button
-            onClick={async () => {
-              await signOut();
-              navigate({ to: "/" });
-            }}
+            onClick={async () => { await signOut(); navigate({ to: "/" }); }}
             className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/60"
           >
             <LogOut className="size-4" /> Sign out
           </button>
         </div>
       </aside>
+
       <main className="flex-1 min-w-0">
+        {/* Mobile top bar */}
+        <div className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b bg-background/80 backdrop-blur px-4 h-14">
+          <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
+            <div className="size-7 rounded-md bg-primary text-primary-foreground grid place-items-center">
+              <GraduationCap className="size-4" />
+            </div>
+            A-Level Ace
+          </Link>
+          <div className="flex items-center gap-1">
+            <DonationButton />
+            <ThemeToggle />
+          </div>
+        </div>
         <Outlet />
+        {/* Mobile bottom nav */}
+        <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-4 border-t bg-background/95 backdrop-blur">
+          {nav.map((n) => {
+            const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
+            return (
+              <Link key={n.to} to={n.to} className={cn("flex flex-col items-center gap-0.5 py-2 text-xs",
+                active ? "text-primary" : "text-muted-foreground")}>
+                <n.icon className="size-5" />
+                {n.label.split(" ")[0]}
+              </Link>
+            );
+          })}
+        </nav>
       </main>
     </div>
   );

@@ -7,8 +7,11 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { ThemeProvider } from "@/lib/theme";
+import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
+
 
 function NotFoundComponent() {
   return (
@@ -113,7 +116,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <ThemeProvider>
+        <Outlet />
+        <Toaster richColors closeButton position="top-right" />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
+
