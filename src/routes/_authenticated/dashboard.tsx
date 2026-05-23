@@ -26,33 +26,57 @@ function Dashboard() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [dueCount, setDueCount] = useState(0);
 
+  const load = async () => {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const uid = u.user.id;
+    const { data: prof } = await supabase.from("profiles").select("display_name, selected_subjects").eq("id", uid).single();
+    setName(prof?.display_name || "Student");
+    const selected: string[] = prof?.selected_subjects || [];
+    if (selected.length) {
+      const [{ data: subs }, { data: tps }] = await Promise.all([
+        supabase.from("subjects").select("*").in("id", selected),
+        supabase.from("topics").select("id, name, subject_id").in("subject_id", selected),
+      ]);
+      setSubjects((subs as Subject[]) || []);
+      setTopics((tps as Topic[]) || []);
+    }
+    const [{ data: at }, { data: cs }, { data: ss }, { count }] = await Promise.all([
+      supabase.from("quiz_attempts").select("id, topic_id, subject_id, score, total").eq("user_id", uid).gt("total", 0).order("started_at", { ascending: false }).limit(200),
+      supabase.from("flashcards").select("id, topic_id, ease, reps").eq("user_id", uid),
+      supabase.from("study_sessions").select("occurred_on, minutes").eq("user_id", uid).order("occurred_on", { ascending: false }).limit(120),
+      supabase.from("flashcards").select("id", { count: "exact", head: true }).eq("user_id", uid).lte("due_at", new Date().toISOString()),
+    ]);
+    setAttempts((at as Attempt[]) || []);
+    setCards((cs as Card[]) || []);
+    setSessions((ss as Session[]) || []);
+    setDueCount(count || 0);
+  };
+
   useEffect(() => {
+    load();
+    let uid: string | null = null;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
-      const uid = u.user.id;
-      const { data: prof } = await supabase.from("profiles").select("display_name, selected_subjects").eq("id", uid).single();
-      setName(prof?.display_name || "Student");
-      const selected: string[] = prof?.selected_subjects || [];
-      if (selected.length) {
-        const [{ data: subs }, { data: tps }] = await Promise.all([
-          supabase.from("subjects").select("*").in("id", selected),
-          supabase.from("topics").select("id, name, subject_id").in("subject_id", selected),
-        ]);
-        setSubjects((subs as Subject[]) || []);
-        setTopics((tps as Topic[]) || []);
-      }
-      const [{ data: at }, { data: cs }, { data: ss }, { count }] = await Promise.all([
-        supabase.from("quiz_attempts").select("id, topic_id, subject_id, score, total").eq("user_id", uid).gt("total", 0).order("started_at", { ascending: false }).limit(200),
-        supabase.from("flashcards").select("id, topic_id, ease, reps").eq("user_id", uid),
-        supabase.from("study_sessions").select("occurred_on, minutes").eq("user_id", uid).order("occurred_on", { ascending: false }).limit(120),
-        supabase.from("flashcards").select("id", { count: "exact", head: true }).eq("user_id", uid).lte("due_at", new Date().toISOString()),
-      ]);
-      setAttempts((at as Attempt[]) || []);
-      setCards((cs as Card[]) || []);
-      setSessions((ss as Session[]) || []);
-      setDueCount(count || 0);
+      uid = u.user.id;
+      channel = supabase
+        .channel(`dashboard:${uid}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "flashcards", filter: `user_id=eq.${uid}` }, () => load())
+        .on("postgres_changes", { event: "*", schema: "public", table: "quiz_attempts", filter: `user_id=eq.${uid}` }, () => load())
+        .on("postgres_changes", { event: "*", schema: "public", table: "study_sessions", filter: `user_id=eq.${uid}` }, () => load())
+        .subscribe();
     })();
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    const onVis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
 
   // Streak + minutes today
