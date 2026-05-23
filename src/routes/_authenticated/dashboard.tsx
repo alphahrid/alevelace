@@ -104,7 +104,7 @@ function Dashboard() {
   // otherwise whichever side has data. Shrinkage pulls low-evidence subjects
   // toward 0 so a single lucky quiz can't show "100% A* ready".
   const subjectMastery = useMemo(() => {
-    const SHRINK = 8; // pseudo-evidence units
+    const SHRINK = 8;
     return subjects.map((sub) => {
       const subTopicIds = new Set(topics.filter((t) => t.subject_id === sub.id).map((t) => t.id));
       const subAttempts = attempts.filter((a) => a.subject_id === sub.id || (a.topic_id && subTopicIds.has(a.topic_id)));
@@ -117,8 +117,8 @@ function Dashboard() {
       let cardWeight = 0;
       let cardScoreSum = 0;
       for (const c of reviewed) {
-        const easeNorm = Math.min(1, Math.max(0, (c.ease - 1.3) / 1.5)); // 1.3→0, 2.8→1
-        const repsFactor = Math.min(1, c.reps / 4); // confidence builds over reps
+        const easeNorm = Math.min(1, Math.max(0, (c.ease - 1.3) / 1.5));
+        const repsFactor = Math.min(1, c.reps / 4);
         const cardScore = easeNorm * (0.6 + 0.4 * repsFactor);
         const w = Math.min(c.reps, 5);
         cardScoreSum += cardScore * w;
@@ -126,19 +126,28 @@ function Dashboard() {
       }
       const cardPct = cardWeight ? cardScoreSum / cardWeight : 0;
 
-      const hasQuiz = quizMarks > 0;
-      const hasCards = cardWeight > 0;
-      let raw = 0;
-      if (hasQuiz && hasCards) raw = quizPct * 0.6 + cardPct * 0.4;
-      else if (hasQuiz) raw = quizPct;
-      else if (hasCards) raw = cardPct;
+      // Past papers — strongest signal (real exam conditions). Weight = total marks.
+      const subPapers = pastPapers.filter((p) => p.subject_id === sub.id);
+      const ppMarks = subPapers.reduce((a, p) => a + p.total, 0);
+      const ppScore = subPapers.reduce((a, p) => a + p.score, 0);
+      const ppPct = ppMarks ? ppScore / ppMarks : 0;
+      const ppWeight = ppMarks * 1.5; // past papers count 1.5x normal evidence
 
-      const evidence = quizMarks + cardWeight;
+      const sources = [
+        { pct: quizPct, w: quizMarks },
+        { pct: cardPct, w: cardWeight },
+        { pct: ppPct, w: ppWeight },
+      ].filter((s) => s.w > 0);
+      const totalW = sources.reduce((a, s) => a + s.w, 0);
+      const raw = totalW ? sources.reduce((a, s) => a + s.pct * s.w, 0) / totalW : 0;
+
+      const evidence = quizMarks + cardWeight + ppWeight;
       const shrunk = evidence === 0 ? 0 : (raw * evidence) / (evidence + SHRINK);
       const mastery = Math.round(shrunk * 100);
       return { ...sub, mastery, samples: evidence };
     });
-  }, [subjects, topics, attempts, cards]);
+  }, [subjects, topics, attempts, cards, pastPapers]);
+
 
   // Weak topics: lowest pct topics with at least 1 attempt
   const weakTopics = useMemo(() => {
@@ -187,11 +196,26 @@ function Dashboard() {
         <p className="text-muted-foreground mt-1">Pick up where you left off.</p>
       </header>
 
-      <section className="grid sm:grid-cols-3 gap-4 mb-8">
+      <section className="grid sm:grid-cols-3 gap-4 mb-6">
         <Stat icon={Flame} label="Day streak" value={`${streak}`} tint="bg-warning/15 text-warning-foreground" />
         <Stat icon={Layers} label="Cards due today" value={`${dueCount}`} tint="bg-primary/10 text-primary" />
         <Stat icon={ClipboardCheck} label="Minutes today" value={`${minutesToday}`} tint="bg-success/15 text-success-foreground" />
       </section>
+
+      {/* Spaced Repetition Smart Alert */}
+      {dueCount > 0 && (
+        <section className="mb-8 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 flex items-center gap-4">
+          <div className="size-12 rounded-xl bg-primary/15 text-primary grid place-items-center shrink-0">
+            <Bell className="size-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold">{dueCount} flashcard{dueCount === 1 ? "" : "s"} due for review today</div>
+            <div className="text-sm text-muted-foreground">Reviewing now keeps your SM-2 streak alive and locks in long-term recall.</div>
+          </div>
+          <Link to="/subjects"><Button size="sm" className="gap-1">Review now <ArrowRight className="size-4" /></Button></Link>
+        </section>
+      )}
+
 
       {/* A* Progress Tracker */}
       <section className="grid lg:grid-cols-3 gap-4 mb-8">
