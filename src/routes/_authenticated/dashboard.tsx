@@ -302,8 +302,79 @@ function Dashboard() {
         )}
       </section>
 
+      {/* Past Paper Active Recall */}
+      <section className="rounded-2xl border bg-card p-6 mb-8">
+        <div className="flex items-center gap-2 mb-1">
+          <FileText className="size-4 text-primary" />
+          <div className="text-sm font-semibold tracking-wide">Past Paper Active Recall</div>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">Log real past-paper scores — they feed directly into your A* Readiness Index with extra weight.</p>
+
+        <form
+          className="grid sm:grid-cols-6 gap-2 mb-4"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!ppForm.subjectId || !ppForm.paper_label || !ppForm.score || !ppForm.total) { toast.error("Fill all required fields"); return; }
+            const score = parseInt(ppForm.score, 10), total = parseInt(ppForm.total, 10);
+            if (isNaN(score) || isNaN(total) || total <= 0 || score < 0 || score > total) { toast.error("Invalid score"); return; }
+            setSavingPp(true);
+            try {
+              const { data: u } = await supabase.auth.getUser();
+              if (!u.user) return;
+              const { error } = await supabase.from("past_paper_scores").insert({
+                user_id: u.user.id, subject_id: ppForm.subjectId, paper_label: ppForm.paper_label,
+                score, total, grade: ppForm.grade || null,
+              });
+              if (error) throw new Error(error.message);
+              toast.success("Past paper logged — A* index updated");
+              setPpForm({ subjectId: "", paper_label: "", score: "", total: "", grade: "" });
+              await load();
+            } catch (err) { toast.error(err instanceof Error ? err.message : "Failed"); }
+            finally { setSavingPp(false); }
+          }}
+        >
+          <select className="sm:col-span-2 rounded-md border bg-background px-3 py-2 text-sm" value={ppForm.subjectId} onChange={(e) => setPpForm((f) => ({ ...f, subjectId: e.target.value }))}>
+            <option value="">Subject…</option>
+            {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+          <Input className="sm:col-span-2" placeholder="e.g. June 2025 Paper 1" value={ppForm.paper_label} onChange={(e) => setPpForm((f) => ({ ...f, paper_label: e.target.value }))} />
+          <Input type="number" min={0} placeholder="Score" value={ppForm.score} onChange={(e) => setPpForm((f) => ({ ...f, score: e.target.value }))} />
+          <div className="flex gap-2">
+            <Input type="number" min={1} placeholder="Total" value={ppForm.total} onChange={(e) => setPpForm((f) => ({ ...f, total: e.target.value }))} />
+          </div>
+          <Input className="sm:col-span-2" placeholder="Grade (optional, e.g. A*)" value={ppForm.grade} onChange={(e) => setPpForm((f) => ({ ...f, grade: e.target.value }))} />
+          <Button type="submit" disabled={savingPp} className="sm:col-span-4 gap-1"><Plus className="size-4" /> {savingPp ? "Saving…" : "Log paper"}</Button>
+        </form>
+
+        {pastPapers.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-4 text-center border-t">No papers logged yet.</div>
+        ) : (
+          <ul className="divide-y border-t">
+            {pastPapers.slice(0, 5).map((p) => {
+              const sub = subjects.find((s) => s.id === p.subject_id);
+              const pct = Math.round((p.score / p.total) * 100);
+              return (
+                <li key={p.id} className="py-3 flex items-center gap-3 text-sm">
+                  <div className="size-2 rounded-full" style={{ background: sub?.color || "#888" }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{p.paper_label}</div>
+                    <div className="text-xs text-muted-foreground">{sub?.name || "—"} · {new Date(p.taken_on).toLocaleDateString()}</div>
+                  </div>
+                  {p.grade && <div className="text-xs font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">{p.grade}</div>}
+                  <div className="text-right tabular-nums">
+                    <div className="font-semibold">{p.score}/{p.total}</div>
+                    <div className="text-xs text-muted-foreground">{pct}%</div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
       {/* Subjects */}
       <section className="mb-8">
+
         <div className="flex items-end justify-between mb-3">
           <h2 className="text-lg font-semibold">Your subjects</h2>
           <Link to="/subjects" className="text-sm text-primary hover:underline">Browse all</Link>
