@@ -67,6 +67,25 @@ function Cards() {
     } finally { setGenerating(false); }
   };
 
+  const [loadingStarter, setLoadingStarter] = useState(false);
+  const loadStarterPack = async () => {
+    setLoadingStarter(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const { data: tpl } = await supabase.from("flashcard_templates").select("front, back").eq("topic_id", topicId).order("position");
+      if (!tpl || tpl.length === 0) { toast.info("No starter pack available for this topic — try Generate."); return; }
+      const rows = (tpl as Array<{ front: string; back: string }>).map((c) => ({ user_id: u.user!.id, topic_id: topicId, front: c.front, back: c.back }));
+      const { error } = await supabase.from("flashcards").insert(rows);
+      if (error) throw new Error(error.message);
+      toast.success(`Added ${rows.length} starter cards`);
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load starter pack");
+    } finally { setLoadingStarter(false); }
+  };
+
+
   const current = queue[0];
 
   return (
@@ -89,8 +108,13 @@ function Cards() {
           {allCount === 0 ? (
             <>
               <p className="font-medium mb-2">No cards yet</p>
-              <p className="text-sm text-muted-foreground mb-4">Generate a starter deck with AI.</p>
-              <Button onClick={generate} disabled={generating}><Sparkles className="size-4 mr-2" /> Generate cards</Button>
+              <p className="text-sm text-muted-foreground mb-4">Load a hand-crafted starter pack or generate fresh ones with AI.</p>
+              <div className="flex gap-2 justify-center flex-wrap">
+                <Button onClick={loadStarterPack} disabled={loadingStarter} variant="default">
+                  {loadingStarter ? "Loading…" : "Load starter pack"}
+                </Button>
+                <Button onClick={generate} disabled={generating} variant="outline"><Sparkles className="size-4 mr-2" /> Generate with AI</Button>
+              </div>
             </>
           ) : (
             <>

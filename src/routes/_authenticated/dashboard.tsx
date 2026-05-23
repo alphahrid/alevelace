@@ -3,14 +3,17 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Flame, BookOpen, ClipboardCheck, Layers, ArrowRight, Trophy, AlertTriangle, MessageSquareText, Sparkles, Timer } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Flame, BookOpen, ClipboardCheck, Layers, ArrowRight, Trophy, AlertTriangle, MessageSquareText, Sparkles, Timer, Bell, FileText, Plus } from "lucide-react";
 import { ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
+import { toast } from "sonner";
 
 type Subject = { id: string; slug: string; name: string; color: string; description: string | null };
 type Topic = { id: string; name: string; subject_id: string };
 type Attempt = { id: string; topic_id: string | null; subject_id: string | null; score: number; total: number };
 type Card = { id: string; topic_id: string; ease: number; reps: number };
 type Session = { occurred_on: string; minutes: number };
+type PastPaper = { id: string; subject_id: string; paper_label: string; score: number; total: number; grade: string | null; taken_on: string };
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — A-Level Ace" }] }),
@@ -25,6 +28,9 @@ function Dashboard() {
   const [cards, setCards] = useState<Card[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [dueCount, setDueCount] = useState(0);
+  const [pastPapers, setPastPapers] = useState<PastPaper[]>([]);
+  const [ppForm, setPpForm] = useState({ subjectId: "", paper_label: "", score: "", total: "", grade: "" });
+  const [savingPp, setSavingPp] = useState(false);
 
   const load = async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -41,16 +47,18 @@ function Dashboard() {
       setSubjects((subs as Subject[]) || []);
       setTopics((tps as Topic[]) || []);
     }
-    const [{ data: at }, { data: cs }, { data: ss }, { count }] = await Promise.all([
+    const [{ data: at }, { data: cs }, { data: ss }, { count }, { data: pp }] = await Promise.all([
       supabase.from("quiz_attempts").select("id, topic_id, subject_id, score, total").eq("user_id", uid).gt("total", 0).order("started_at", { ascending: false }).limit(200),
       supabase.from("flashcards").select("id, topic_id, ease, reps").eq("user_id", uid),
       supabase.from("study_sessions").select("occurred_on, minutes").eq("user_id", uid).order("occurred_on", { ascending: false }).limit(120),
       supabase.from("flashcards").select("id", { count: "exact", head: true }).eq("user_id", uid).lte("due_at", new Date().toISOString()),
+      supabase.from("past_paper_scores").select("id, subject_id, paper_label, score, total, grade, taken_on").eq("user_id", uid).order("taken_on", { ascending: false }).limit(20),
     ]);
     setAttempts((at as Attempt[]) || []);
     setCards((cs as Card[]) || []);
     setSessions((ss as Session[]) || []);
     setDueCount(count || 0);
+    setPastPapers((pp as PastPaper[]) || []);
   };
 
   useEffect(() => {
@@ -96,7 +104,7 @@ function Dashboard() {
   // otherwise whichever side has data. Shrinkage pulls low-evidence subjects
   // toward 0 so a single lucky quiz can't show "100% A* ready".
   const subjectMastery = useMemo(() => {
-    const SHRINK = 8; // pseudo-evidence units
+    const SHRINK = 8;
     return subjects.map((sub) => {
       const subTopicIds = new Set(topics.filter((t) => t.subject_id === sub.id).map((t) => t.id));
       const subAttempts = attempts.filter((a) => a.subject_id === sub.id || (a.topic_id && subTopicIds.has(a.topic_id)));
@@ -109,8 +117,8 @@ function Dashboard() {
       let cardWeight = 0;
       let cardScoreSum = 0;
       for (const c of reviewed) {
-        const easeNorm = Math.min(1, Math.max(0, (c.ease - 1.3) / 1.5)); // 1.3→0, 2.8→1
-        const repsFactor = Math.min(1, c.reps / 4); // confidence builds over reps
+        const easeNorm = Math.min(1, Math.max(0, (c.ease - 1.3) / 1.5));
+        const repsFactor = Math.min(1, c.reps / 4);
         const cardScore = easeNorm * (0.6 + 0.4 * repsFactor);
         const w = Math.min(c.reps, 5);
         cardScoreSum += cardScore * w;
@@ -118,19 +126,28 @@ function Dashboard() {
       }
       const cardPct = cardWeight ? cardScoreSum / cardWeight : 0;
 
-      const hasQuiz = quizMarks > 0;
-      const hasCards = cardWeight > 0;
-      let raw = 0;
-      if (hasQuiz && hasCards) raw = quizPct * 0.6 + cardPct * 0.4;
-      else if (hasQuiz) raw = quizPct;
-      else if (hasCards) raw = cardPct;
+      // Past papers — strongest signal (real exam conditions). Weight = total marks.
+      const subPapers = pastPapers.filter((p) => p.subject_id === sub.id);
+      const ppMarks = subPapers.reduce((a, p) => a + p.total, 0);
+      const ppScore = subPapers.reduce((a, p) => a + p.score, 0);
+      const ppPct = ppMarks ? ppScore / ppMarks : 0;
+      const ppWeight = ppMarks * 1.5; // past papers count 1.5x normal evidence
 
-      const evidence = quizMarks + cardWeight;
+      const sources = [
+        { pct: quizPct, w: quizMarks },
+        { pct: cardPct, w: cardWeight },
+        { pct: ppPct, w: ppWeight },
+      ].filter((s) => s.w > 0);
+      const totalW = sources.reduce((a, s) => a + s.w, 0);
+      const raw = totalW ? sources.reduce((a, s) => a + s.pct * s.w, 0) / totalW : 0;
+
+      const evidence = quizMarks + cardWeight + ppWeight;
       const shrunk = evidence === 0 ? 0 : (raw * evidence) / (evidence + SHRINK);
       const mastery = Math.round(shrunk * 100);
       return { ...sub, mastery, samples: evidence };
     });
-  }, [subjects, topics, attempts, cards]);
+  }, [subjects, topics, attempts, cards, pastPapers]);
+
 
   // Weak topics: lowest pct topics with at least 1 attempt
   const weakTopics = useMemo(() => {
@@ -179,11 +196,26 @@ function Dashboard() {
         <p className="text-muted-foreground mt-1">Pick up where you left off.</p>
       </header>
 
-      <section className="grid sm:grid-cols-3 gap-4 mb-8">
+      <section className="grid sm:grid-cols-3 gap-4 mb-6">
         <Stat icon={Flame} label="Day streak" value={`${streak}`} tint="bg-warning/15 text-warning-foreground" />
         <Stat icon={Layers} label="Cards due today" value={`${dueCount}`} tint="bg-primary/10 text-primary" />
         <Stat icon={ClipboardCheck} label="Minutes today" value={`${minutesToday}`} tint="bg-success/15 text-success-foreground" />
       </section>
+
+      {/* Spaced Repetition Smart Alert */}
+      {dueCount > 0 && (
+        <section className="mb-8 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 flex items-center gap-4">
+          <div className="size-12 rounded-xl bg-primary/15 text-primary grid place-items-center shrink-0">
+            <Bell className="size-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold">{dueCount} flashcard{dueCount === 1 ? "" : "s"} due for review today</div>
+            <div className="text-sm text-muted-foreground">Reviewing now keeps your SM-2 streak alive and locks in long-term recall.</div>
+          </div>
+          <Link to="/subjects"><Button size="sm" className="gap-1">Review now <ArrowRight className="size-4" /></Button></Link>
+        </section>
+      )}
+
 
       {/* A* Progress Tracker */}
       <section className="grid lg:grid-cols-3 gap-4 mb-8">
@@ -270,8 +302,79 @@ function Dashboard() {
         )}
       </section>
 
+      {/* Past Paper Active Recall */}
+      <section className="rounded-2xl border bg-card p-6 mb-8">
+        <div className="flex items-center gap-2 mb-1">
+          <FileText className="size-4 text-primary" />
+          <div className="text-sm font-semibold tracking-wide">Past Paper Active Recall</div>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">Log real past-paper scores — they feed directly into your A* Readiness Index with extra weight.</p>
+
+        <form
+          className="grid sm:grid-cols-6 gap-2 mb-4"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!ppForm.subjectId || !ppForm.paper_label || !ppForm.score || !ppForm.total) { toast.error("Fill all required fields"); return; }
+            const score = parseInt(ppForm.score, 10), total = parseInt(ppForm.total, 10);
+            if (isNaN(score) || isNaN(total) || total <= 0 || score < 0 || score > total) { toast.error("Invalid score"); return; }
+            setSavingPp(true);
+            try {
+              const { data: u } = await supabase.auth.getUser();
+              if (!u.user) return;
+              const { error } = await supabase.from("past_paper_scores").insert({
+                user_id: u.user.id, subject_id: ppForm.subjectId, paper_label: ppForm.paper_label,
+                score, total, grade: ppForm.grade || null,
+              });
+              if (error) throw new Error(error.message);
+              toast.success("Past paper logged — A* index updated");
+              setPpForm({ subjectId: "", paper_label: "", score: "", total: "", grade: "" });
+              await load();
+            } catch (err) { toast.error(err instanceof Error ? err.message : "Failed"); }
+            finally { setSavingPp(false); }
+          }}
+        >
+          <select className="sm:col-span-2 rounded-md border bg-background px-3 py-2 text-sm" value={ppForm.subjectId} onChange={(e) => setPpForm((f) => ({ ...f, subjectId: e.target.value }))}>
+            <option value="">Subject…</option>
+            {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+          <Input className="sm:col-span-2" placeholder="e.g. June 2025 Paper 1" value={ppForm.paper_label} onChange={(e) => setPpForm((f) => ({ ...f, paper_label: e.target.value }))} />
+          <Input type="number" min={0} placeholder="Score" value={ppForm.score} onChange={(e) => setPpForm((f) => ({ ...f, score: e.target.value }))} />
+          <div className="flex gap-2">
+            <Input type="number" min={1} placeholder="Total" value={ppForm.total} onChange={(e) => setPpForm((f) => ({ ...f, total: e.target.value }))} />
+          </div>
+          <Input className="sm:col-span-2" placeholder="Grade (optional, e.g. A*)" value={ppForm.grade} onChange={(e) => setPpForm((f) => ({ ...f, grade: e.target.value }))} />
+          <Button type="submit" disabled={savingPp} className="sm:col-span-4 gap-1"><Plus className="size-4" /> {savingPp ? "Saving…" : "Log paper"}</Button>
+        </form>
+
+        {pastPapers.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-4 text-center border-t">No papers logged yet.</div>
+        ) : (
+          <ul className="divide-y border-t">
+            {pastPapers.slice(0, 5).map((p) => {
+              const sub = subjects.find((s) => s.id === p.subject_id);
+              const pct = Math.round((p.score / p.total) * 100);
+              return (
+                <li key={p.id} className="py-3 flex items-center gap-3 text-sm">
+                  <div className="size-2 rounded-full" style={{ background: sub?.color || "#888" }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{p.paper_label}</div>
+                    <div className="text-xs text-muted-foreground">{sub?.name || "—"} · {new Date(p.taken_on).toLocaleDateString()}</div>
+                  </div>
+                  {p.grade && <div className="text-xs font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">{p.grade}</div>}
+                  <div className="text-right tabular-nums">
+                    <div className="font-semibold">{p.score}/{p.total}</div>
+                    <div className="text-xs text-muted-foreground">{pct}%</div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
       {/* Subjects */}
       <section className="mb-8">
+
         <div className="flex items-end justify-between mb-3">
           <h2 className="text-lg font-semibold">Your subjects</h2>
           <Link to="/subjects" className="text-sm text-primary hover:underline">Browse all</Link>

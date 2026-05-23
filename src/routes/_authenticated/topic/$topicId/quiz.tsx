@@ -56,6 +56,36 @@ function Quiz() {
     finally { setGenerating(false); }
   };
 
+  const [loadingStarter, setLoadingStarter] = useState(false);
+  const loadStarterPack = async () => {
+    setLoadingStarter(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const { data: tpl } = await supabase.from("quiz_question_templates").select("type, board, prompt, choices, answer, explanation, difficulty").eq("topic_id", topicId);
+      if (!tpl || tpl.length === 0) { toast.info("No starter pack for this topic — try Generate."); return; }
+      const rows = (tpl as Array<{ type: "mcq" | "short"; board: string; prompt: string; choices: unknown; answer: string; explanation: string | null; difficulty: number }>)
+        .map((q) => ({
+          user_id: u.user!.id,
+          topic_id: topicId,
+          board: q.board as "cambridge" | "edexcel" | "both",
+          type: q.type,
+          prompt: q.prompt,
+          choices: q.type === "mcq" ? (q.choices as string[] | null) : null,
+          answer: q.answer,
+          explanation: q.explanation ?? "",
+          difficulty: q.difficulty ?? 2,
+        }));
+      const { error } = await supabase.from("quiz_questions").insert(rows);
+      if (error) throw new Error(error.message);
+      toast.success(`Added ${rows.length} starter questions`);
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load starter pack");
+    } finally { setLoadingStarter(false); }
+  };
+
+
   const q = questions[idx];
 
   const submit = async () => {
@@ -116,8 +146,11 @@ function Quiz() {
       {!q ? (
         <div className="rounded-xl border bg-card p-10 text-center">
           <p className="font-medium mb-2">No questions yet</p>
-          <p className="text-sm text-muted-foreground mb-4">Generate exam-style questions with AI.</p>
-          <Button onClick={generate} disabled={generating}><Sparkles className="size-4 mr-2" /> Generate quiz</Button>
+          <p className="text-sm text-muted-foreground mb-4">Load a curated starter pack or generate fresh ones with AI.</p>
+          <div className="flex gap-2 justify-center flex-wrap">
+            <Button onClick={loadStarterPack} disabled={loadingStarter}>{loadingStarter ? "Loading…" : "Load starter pack"}</Button>
+            <Button onClick={generate} disabled={generating} variant="outline"><Sparkles className="size-4 mr-2" /> Generate with AI</Button>
+          </div>
         </div>
       ) : (
         <div className="rounded-xl border bg-card p-6">

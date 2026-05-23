@@ -91,7 +91,7 @@ export const generateQuiz = createServerFn({ method: "POST" })
 
     const result = await callAIJSON(
       [
-        { role: "system", content: "You write A-Level exam-style questions. Mix MCQ (4 choices) with short-answer items. Use LaTeX for maths. Make answers and explanations precise." },
+        { role: "system", content: `You write A-Level exam-style questions in the style of **${data.board === "both" ? "Cambridge (CAIE) and Edexcel" : data.board === "cambridge" ? "Cambridge (CAIE)" : "Edexcel"}**. Mix MCQ (4 choices) with short-answer items using authentic command words ("State", "Describe", "Explain", "Calculate", "Derive", "Evaluate"). For maths/sciences, ALL equations must use KaTeX ($...$ inline, $$...$$ display). Explanations should read like a mark scheme — list mark points (M1, A1, B1) where appropriate. Make answers precise.` },
         { role: "user", content: `Generate ${data.count} A-Level practice questions for: ${topicLabel}. Exam board flavour: ${data.board}. Roughly 60% MCQ, 40% short answer. For MCQ, the answer must exactly match one of the choices.` },
       ],
       {
@@ -147,15 +147,24 @@ export const gradeShortAnswer = createServerFn({ method: "POST" })
       userAnswer: z.string().min(0).max(8000),
     }).parse(d)
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: profile } = await supabase.from("profiles").select("exam_boards").eq("id", context.userId).single();
+    const boards = (profile?.exam_boards as string[] | null) || ["both"];
+    const boardLabel = boards.includes("both") || boards.length > 1
+      ? "Cambridge (CAIE) and Edexcel"
+      : boards[0] === "cambridge" ? "Cambridge (CAIE)"
+      : boards[0] === "edexcel" ? "Edexcel"
+      : "Cambridge (CAIE) and Edexcel";
+
     const result = await callAIJSON(
       [
-        { role: "system", content: "You are an A-Level examiner. Mark the candidate's answer against the model answer. Return a score 0-1, whether it is essentially correct, and concise constructive feedback (1-3 sentences)." },
+        { role: "system", content: `You are a senior **${boardLabel}** A-Level examiner. Mark the candidate's answer against the model answer using a typical board mark scheme. Award marks point-by-point (M1/A1/B1 style). Return: a 0-1 score, whether it is essentially correct (>=0.7 score), and concise constructive **Socratic feedback** (2-4 sentences): (a) which mark-scheme points were hit, (b) which were missed and **why**, (c) one specific tip to write an A* version next time using the relevant command word. Use KaTeX ($...$ / $$...$$) for any maths.` },
         { role: "user", content: `Question:\n${data.prompt}\n\nModel answer:\n${data.modelAnswer}\n\nCandidate answer:\n${data.userAnswer || "(no answer given)"}` },
       ],
       {
         name: "grade",
-        description: "Mark the answer",
+        description: "Mark the answer with board-aligned mark scheme feedback",
         parameters: {
           type: "object",
           properties: {
