@@ -68,6 +68,41 @@ export type Database = {
           },
         ]
       }
+      flashcard_templates: {
+        Row: {
+          back: string
+          created_at: string
+          front: string
+          id: string
+          position: number
+          topic_id: string
+        }
+        Insert: {
+          back: string
+          created_at?: string
+          front: string
+          id?: string
+          position?: number
+          topic_id: string
+        }
+        Update: {
+          back?: string
+          created_at?: string
+          front?: string
+          id?: string
+          position?: number
+          topic_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcard_templates_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flashcards: {
         Row: {
           back: string
@@ -120,6 +155,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      past_paper_scores: {
+        Row: {
+          board: Database["public"]["Enums"]["exam_board"]
+          created_at: string
+          grade: string | null
+          id: string
+          notes: string | null
+          paper_label: string
+          score: number
+          subject_id: string
+          taken_on: string
+          total: number
+          user_id: string
+        }
+        Insert: {
+          board?: Database["public"]["Enums"]["exam_board"]
+          created_at?: string
+          grade?: string | null
+          id?: string
+          notes?: string | null
+          paper_label: string
+          score: number
+          subject_id: string
+          taken_on?: string
+          total: number
+          user_id: string
+        }
+        Update: {
+          board?: Database["public"]["Enums"]["exam_board"]
+          created_at?: string
+          grade?: string | null
+          id?: string
+          notes?: string | null
+          paper_label?: string
+          score?: number
+          subject_id?: string
+          taken_on?: string
+          total?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -195,6 +272,56 @@ export type Database = {
           },
           {
             foreignKeyName: "quiz_attempts_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_question_templates: {
+        Row: {
+          answer: string
+          board: Database["public"]["Enums"]["exam_board"]
+          choices: Json | null
+          created_at: string
+          difficulty: number
+          explanation: string | null
+          id: string
+          mark_scheme: string | null
+          prompt: string
+          topic_id: string
+          type: Database["public"]["Enums"]["question_type"]
+        }
+        Insert: {
+          answer: string
+          board?: Database["public"]["Enums"]["exam_board"]
+          choices?: Json | null
+          created_at?: string
+          difficulty?: number
+          explanation?: string | null
+          id?: string
+          mark_scheme?: string | null
+          prompt: string
+          topic_id: string
+          type: Database["public"]["Enums"]["question_type"]
+        }
+        Update: {
+          answer?: string
+          board?: Database["public"]["Enums"]["exam_board"]
+          choices?: Json | null
+          created_at?: string
+          difficulty?: number
+          explanation?: string | null
+          id?: string
+          mark_scheme?: string | null
+          prompt?: string
+          topic_id?: string
+          type?: Database["public"]["Enums"]["question_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_question_templates_topic_id_fkey"
             columns: ["topic_id"]
             isOneToOne: false
             referencedRelation: "topics"
