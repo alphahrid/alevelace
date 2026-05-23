@@ -44,8 +44,8 @@ export function DonationButton({ variant = "ghost" }: { variant?: "ghost" | "out
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">bKash Merchant / Personal</div>
               <div className="flex items-center justify-between gap-3">
                 <div className="text-2xl font-bold tracking-tight tabular-nums">{BKASH_NUMBER}</div>
-                <Button size="sm" variant="outline" onClick={copy} className="gap-1.5">
-                  {copied ? <Check className="size-4" /> : <Copy className="size-4" />} {copied ? "Copied" : "Copy"}
+                <Button size="sm" variant="default" onClick={copy} className="gap-1.5 shrink-0">
+                  {copied ? <Check className="size-4" /> : <Copy className="size-4" />} {copied ? "Copied" : "Copy Number"}
                 </Button>
               </div>
               <ol className="mt-4 text-sm text-muted-foreground space-y-1.5 list-decimal list-inside">
@@ -54,6 +54,18 @@ export function DonationButton({ variant = "ghost" }: { variant?: "ghost" | "out
                 <li>Enter the number above and the amount you'd like to give.</li>
                 <li>Confirm with your bKash PIN — that's it. Thank you 🙏</li>
               </ol>
+              <Button
+                className="w-full mt-4 gap-2"
+                onClick={() => {
+                  toast.success("Thank you so much! 💖", {
+                    description: "Your support keeps the AI tutor free for every A-Level student. You're a legend.",
+                    duration: 5000,
+                  });
+                  setOpen(false);
+                }}
+              >
+                <Heart className="size-4 fill-current" /> I've sent it — Confirm
+              </Button>
             </div>
           </TabsContent>
 

@@ -45,7 +45,7 @@ export const generateMockExam = createServerFn({ method: "POST" })
 
     const result = await callAIJSON(
       [
-        { role: "system", content: "You write realistic A-Level mock-exam questions blending MCQ and short-answer items across the whole syllabus. Use LaTeX for maths. Mark schemes must be precise." },
+        { role: "system", content: `You write realistic A-Level mock-exam questions in the style of **${data.board === "both" ? "Cambridge (CAIE) and Edexcel" : data.board === "cambridge" ? "Cambridge (CAIE)" : "Edexcel"}**, blending MCQ and short-answer items across the whole syllabus. Use authentic A-Level command words ("State", "Describe", "Explain", "Calculate", "Derive", "Evaluate"). For maths/sciences, ALL equations MUST use KaTeX ($...$ inline, $$...$$ display). Model answers and explanations MUST read like a board mark scheme (list mark points M1/A1/B1, units required, accept-list of equivalent answers).` },
         { role: "user", content: `Build a ${data.count}-question A-Level mock paper for the subject "${(subject as { name: string }).name}". Cover broadly: ${topicList}. Exam board flavour: ${data.board}. ~50% MCQ, ~50% short answer. For MCQ, the answer must exactly match one of the choices.` },
       ],
       {
