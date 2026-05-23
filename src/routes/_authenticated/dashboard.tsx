@@ -90,23 +90,45 @@ function Dashboard() {
     return { streak: s, minutesToday: m };
   }, [sessions]);
 
-  // Mastery per subject: 60% avg quiz pct + 40% normalized flashcard ease
+  // Mastery per subject — weighted by evidence with Bayesian shrinkage.
+  // Quiz: weight = total marks. Card: per-card score from SM-2 ease + reps,
+  // weight = min(reps, 5). Final = 60% quiz + 40% cards if both exist,
+  // otherwise whichever side has data. Shrinkage pulls low-evidence subjects
+  // toward 0 so a single lucky quiz can't show "100% A* ready".
   const subjectMastery = useMemo(() => {
+    const SHRINK = 8; // pseudo-evidence units
     return subjects.map((sub) => {
       const subTopicIds = new Set(topics.filter((t) => t.subject_id === sub.id).map((t) => t.id));
       const subAttempts = attempts.filter((a) => a.subject_id === sub.id || (a.topic_id && subTopicIds.has(a.topic_id)));
-      const quizPct = subAttempts.length
-        ? subAttempts.reduce((acc, a) => acc + (a.total ? a.score / a.total : 0), 0) / subAttempts.length
-        : 0;
+      const quizMarks = subAttempts.reduce((a, x) => a + x.total, 0);
+      const quizScore = subAttempts.reduce((a, x) => a + x.score, 0);
+      const quizPct = quizMarks ? quizScore / quizMarks : 0;
+
       const subCards = cards.filter((c) => subTopicIds.has(c.topic_id));
-      const reviewedCards = subCards.filter((c) => c.reps > 0);
-      const easeAvg = reviewedCards.length
-        ? reviewedCards.reduce((a, c) => a + c.ease, 0) / reviewedCards.length
-        : 0;
-      const easeNorm = easeAvg ? Math.min(1, Math.max(0, (easeAvg - 1.3) / 1.3)) : 0;
-      const samples = subAttempts.length + reviewedCards.length;
-      const mastery = samples === 0 ? 0 : Math.round((quizPct * 0.6 + easeNorm * 0.4) * 100);
-      return { ...sub, mastery, samples };
+      const reviewed = subCards.filter((c) => c.reps > 0);
+      let cardWeight = 0;
+      let cardScoreSum = 0;
+      for (const c of reviewed) {
+        const easeNorm = Math.min(1, Math.max(0, (c.ease - 1.3) / 1.5)); // 1.3→0, 2.8→1
+        const repsFactor = Math.min(1, c.reps / 4); // confidence builds over reps
+        const cardScore = easeNorm * (0.6 + 0.4 * repsFactor);
+        const w = Math.min(c.reps, 5);
+        cardScoreSum += cardScore * w;
+        cardWeight += w;
+      }
+      const cardPct = cardWeight ? cardScoreSum / cardWeight : 0;
+
+      const hasQuiz = quizMarks > 0;
+      const hasCards = cardWeight > 0;
+      let raw = 0;
+      if (hasQuiz && hasCards) raw = quizPct * 0.6 + cardPct * 0.4;
+      else if (hasQuiz) raw = quizPct;
+      else if (hasCards) raw = cardPct;
+
+      const evidence = quizMarks + cardWeight;
+      const shrunk = evidence === 0 ? 0 : (raw * evidence) / (evidence + SHRINK);
+      const mastery = Math.round(shrunk * 100);
+      return { ...sub, mastery, samples: evidence };
     });
   }, [subjects, topics, attempts, cards]);
 
