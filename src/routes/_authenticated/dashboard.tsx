@@ -3,14 +3,17 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Flame, BookOpen, ClipboardCheck, Layers, ArrowRight, Trophy, AlertTriangle, MessageSquareText, Sparkles, Timer } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Flame, BookOpen, ClipboardCheck, Layers, ArrowRight, Trophy, AlertTriangle, MessageSquareText, Sparkles, Timer, Bell, FileText, Plus } from "lucide-react";
 import { ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
+import { toast } from "sonner";
 
 type Subject = { id: string; slug: string; name: string; color: string; description: string | null };
 type Topic = { id: string; name: string; subject_id: string };
 type Attempt = { id: string; topic_id: string | null; subject_id: string | null; score: number; total: number };
 type Card = { id: string; topic_id: string; ease: number; reps: number };
 type Session = { occurred_on: string; minutes: number };
+type PastPaper = { id: string; subject_id: string; paper_label: string; score: number; total: number; grade: string | null; taken_on: string };
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — A-Level Ace" }] }),
@@ -25,6 +28,9 @@ function Dashboard() {
   const [cards, setCards] = useState<Card[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [dueCount, setDueCount] = useState(0);
+  const [pastPapers, setPastPapers] = useState<PastPaper[]>([]);
+  const [ppForm, setPpForm] = useState({ subjectId: "", paper_label: "", score: "", total: "", grade: "" });
+  const [savingPp, setSavingPp] = useState(false);
 
   const load = async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -41,16 +47,18 @@ function Dashboard() {
       setSubjects((subs as Subject[]) || []);
       setTopics((tps as Topic[]) || []);
     }
-    const [{ data: at }, { data: cs }, { data: ss }, { count }] = await Promise.all([
+    const [{ data: at }, { data: cs }, { data: ss }, { count }, { data: pp }] = await Promise.all([
       supabase.from("quiz_attempts").select("id, topic_id, subject_id, score, total").eq("user_id", uid).gt("total", 0).order("started_at", { ascending: false }).limit(200),
       supabase.from("flashcards").select("id, topic_id, ease, reps").eq("user_id", uid),
       supabase.from("study_sessions").select("occurred_on, minutes").eq("user_id", uid).order("occurred_on", { ascending: false }).limit(120),
       supabase.from("flashcards").select("id", { count: "exact", head: true }).eq("user_id", uid).lte("due_at", new Date().toISOString()),
+      supabase.from("past_paper_scores").select("id, subject_id, paper_label, score, total, grade, taken_on").eq("user_id", uid).order("taken_on", { ascending: false }).limit(20),
     ]);
     setAttempts((at as Attempt[]) || []);
     setCards((cs as Card[]) || []);
     setSessions((ss as Session[]) || []);
     setDueCount(count || 0);
+    setPastPapers((pp as PastPaper[]) || []);
   };
 
   useEffect(() => {
