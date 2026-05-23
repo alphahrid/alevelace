@@ -2,12 +2,27 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-const SYSTEM = `You are an expert A-Level tutor for Cambridge (CAIE) and Edexcel. Be concise, clear, and rigorous.
-- Use markdown formatting (headings, bullet points, code blocks where appropriate).
-- For mathematics, use LaTeX delimited by $...$ for inline and $$...$$ for display equations. NEVER use \\( \\) or \\[ \\].
-- For derivations and worked solutions, show every step with a brief justification.
-- Reference the relevant A-Level topic context the user provides. If unsure, say so and ask a clarifying question.
-- For essays/theory subjects, give structured answers with key terms in bold.`;
+function buildSystemPrompt(boardLabel: string, topicContext?: string) {
+  return `You are an expert A-Level tutor, examiner, and study coach for **${boardLabel}**.
+
+## Marking & board awareness
+- Always tailor explanations, command-word interpretation, and mark schemes to **${boardLabel}** conventions.
+- When the student gives an answer or attempts a question, treat yourself as a senior examiner: identify exactly where marks would be **awarded** and **lost** against a typical board mark scheme, point-by-point (e.g. "M1 — substitution: ✅", "A1 — final value with unit: ❌ missing unit").
+- Highlight A-Level **command words** ("State", "Describe", "Explain", "Evaluate", "Compare", "Derive", "Justify") and what depth each demands. Show the student how to write a full-mark / **A\\* grade** response when relevant.
+
+## Socratic method (DEFAULT BEHAVIOUR)
+- **Do NOT just hand over the final answer.** Guide the student step-by-step with leading questions and small hints first.
+- After each hint, pause and invite the student to try the next step ("What would you do next?").
+- Only reveal a full worked solution if the student explicitly asks ("just show me", "give the answer", "solve it for me") OR after they have attempted and asked for the model answer.
+
+## Formatting
+- Use **markdown**: headings, bullets, bold key terms.
+- **Mathematics & sciences**: ALL equations MUST use KaTeX — inline \`$...$\`, display \`$$...$$\`. Never use \`\\(\\)\` or \`\\[\\]\`. Format derivations one step per line.
+- For essay subjects (History, Economics, Psychology, Business), use **PEEL/PEAL** structures and bold key technical terms.
+- Be concise and rigorous — no fluff.
+
+${topicContext ? `## Current A-Level topic\n${topicContext}` : ""}`;
+}
 
 export const Route = createFileRoute("/api/tutor")({
   server: {
@@ -30,6 +45,15 @@ export const Route = createFileRoute("/api/tutor")({
         const body = (await request.json()) as { conversationId: string; topicContext?: string; userMessage: string };
         if (!body.conversationId || !body.userMessage) return new Response("Bad request", { status: 400 });
 
+        // Look up the student's preferred exam board(s)
+        const { data: profile } = await sb.from("profiles").select("exam_boards").eq("id", userId).single();
+        const boards = (profile?.exam_boards as string[] | null) || ["both"];
+        const boardLabel = boards.includes("both") || boards.length > 1
+          ? "Cambridge (CAIE) and Edexcel"
+          : boards[0] === "cambridge" ? "Cambridge (CAIE)"
+          : boards[0] === "edexcel" ? "Edexcel"
+          : "Cambridge (CAIE) and Edexcel";
+
         // Load history
         const { data: history } = await sb
           .from("tutor_messages")
@@ -46,7 +70,7 @@ export const Route = createFileRoute("/api/tutor")({
           content: body.userMessage,
         });
 
-        const systemPrompt = SYSTEM + (body.topicContext ? `\n\nCurrent A-Level topic: ${body.topicContext}` : "");
+        const systemPrompt = buildSystemPrompt(boardLabel, body.topicContext);
         const messages = [
           { role: "system", content: systemPrompt },
           ...(history || []).map((m) => ({ role: m.role, content: m.content })),
@@ -69,10 +93,8 @@ export const Route = createFileRoute("/api/tutor")({
           return new Response(JSON.stringify({ error: "AI error" }), { status: 500, headers: { "Content-Type": "application/json" } });
         }
 
-        // Tee the stream so we can persist while streaming to client
         const [a, b] = upstream.body!.tee();
 
-        // Persist asynchronously
         (async () => {
           try {
             const reader = b.getReader();
