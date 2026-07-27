@@ -8,6 +8,7 @@ import { DonationButton } from "@/components/DonationModal";
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
   { to: "/subjects", label: "Subjects", icon: BookOpen },
+  { to: "/tutor", label: "AI Tutor", icon: Sparkles },
   { to: "/mock", label: "Mock exams", icon: Timer },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
@@ -49,12 +50,12 @@ export function AppShell() {
           })}
         </nav>
         <div className="p-3 border-t border-sidebar-border space-y-2">
-          <div className="rounded-md bg-accent/50 p-3 text-xs text-accent-foreground">
+          <Link to="/tutor" className="block rounded-md bg-accent/50 p-3 text-xs text-accent-foreground hover:bg-accent transition-colors">
             <div className="flex items-center gap-1 font-medium mb-1">
               <Sparkles className="size-3" /> AI Tutor
             </div>
             Ask any question from any topic. Worked solutions for maths included.
-          </div>
+          </Link>
           <div className="flex items-center gap-1">
             <DonationButton />
             <ThemeToggle />
@@ -84,7 +85,7 @@ export function AppShell() {
         </div>
         <Outlet />
         {/* Mobile bottom nav */}
-        <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-4 border-t bg-background/95 backdrop-blur">
+        <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur">
           {nav.map((n) => {
             const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
             return (

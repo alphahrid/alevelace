@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
+import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedSubjectsRouteImport } from './routes/_authenticated/subjects'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
@@ -54,6 +55,11 @@ const ApiTutorRoute = ApiTutorRouteImport.update({
   id: '/api/tutor',
   path: '/api/tutor',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTutorRoute = AuthenticatedTutorRouteImport.update({
+  id: '/tutor',
+  path: '/tutor',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSubjectsRoute = AuthenticatedSubjectsRouteImport.update({
   id: '/subjects',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/mock': typeof AuthenticatedMockRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
+  '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
   '/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/mock': typeof AuthenticatedMockRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
+  '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
   '/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/_authenticated/mock': typeof AuthenticatedMockRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/subjects': typeof AuthenticatedSubjectsRouteWithChildren
+  '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
   '/_authenticated/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/_authenticated/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/mock'
     | '/settings'
     | '/subjects'
+    | '/tutor'
     | '/api/tutor'
     | '/mock/$subjectId'
     | '/subjects/$slug'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/mock'
     | '/settings'
     | '/subjects'
+    | '/tutor'
     | '/api/tutor'
     | '/mock/$subjectId'
     | '/subjects/$slug'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mock'
     | '/_authenticated/settings'
     | '/_authenticated/subjects'
+    | '/_authenticated/tutor'
     | '/api/tutor'
     | '/_authenticated/mock/$subjectId'
     | '/_authenticated/subjects/$slug'
@@ -272,6 +284,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/tutor'
       preLoaderRoute: typeof ApiTutorRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tutor': {
+      id: '/_authenticated/tutor'
+      path: '/tutor'
+      fullPath: '/tutor'
+      preLoaderRoute: typeof AuthenticatedTutorRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/subjects': {
       id: '/_authenticated/subjects'
@@ -393,6 +412,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMockRoute: typeof AuthenticatedMockRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSubjectsRoute: typeof AuthenticatedSubjectsRouteWithChildren
+  AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedTopicTopicIdRoute: typeof AuthenticatedTopicTopicIdRouteWithChildren
 }
 
@@ -401,6 +421,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMockRoute: AuthenticatedMockRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSubjectsRoute: AuthenticatedSubjectsRouteWithChildren,
+  AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedTopicTopicIdRoute: AuthenticatedTopicTopicIdRouteWithChildren,
 }
 
