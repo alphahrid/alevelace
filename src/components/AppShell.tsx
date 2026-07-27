@@ -50,12 +50,12 @@ export function AppShell() {
           })}
         </nav>
         <div className="p-3 border-t border-sidebar-border space-y-2">
-          <div className="rounded-md bg-accent/50 p-3 text-xs text-accent-foreground">
+          <Link to="/tutor" className="block rounded-md bg-accent/50 p-3 text-xs text-accent-foreground hover:bg-accent transition-colors">
             <div className="flex items-center gap-1 font-medium mb-1">
               <Sparkles className="size-3" /> AI Tutor
             </div>
             Ask any question from any topic. Worked solutions for maths included.
-          </div>
+          </Link>
           <div className="flex items-center gap-1">
             <DonationButton />
             <ThemeToggle />
