@@ -20,6 +20,7 @@ import { Route as AuthenticatedSubjectsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCommandWordsRouteImport } from './routes/_authenticated/command-words'
 import { Route as AuthenticatedTopicTopicIdRouteImport } from './routes/_authenticated/topic/$topicId'
 import { Route as AuthenticatedSubjectsSlugRouteImport } from './routes/_authenticated/subjects/$slug'
 import { Route as AuthenticatedMockSubjectIdRouteImport } from './routes/_authenticated/mock/$subjectId'
@@ -81,6 +82,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCommandWordsRoute =
+  AuthenticatedCommandWordsRouteImport.update({
+    id: '/command-words',
+    path: '/command-words',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTopicTopicIdRoute =
   AuthenticatedTopicTopicIdRouteImport.update({
     id: '/topic/$topicId',
@@ -123,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/command-words': typeof AuthenticatedCommandWordsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/mock': typeof AuthenticatedMockRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
@@ -141,6 +149,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/command-words': typeof AuthenticatedCommandWordsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/mock': typeof AuthenticatedMockRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/command-words': typeof AuthenticatedCommandWordsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/mock': typeof AuthenticatedMockRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/signup'
+    | '/command-words'
     | '/dashboard'
     | '/mock'
     | '/settings'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/signup'
+    | '/command-words'
     | '/dashboard'
     | '/mock'
     | '/settings'
@@ -218,6 +230,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/signup'
+    | '/_authenticated/command-words'
     | '/_authenticated/dashboard'
     | '/_authenticated/mock'
     | '/_authenticated/settings'
@@ -320,6 +333,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/command-words': {
+      id: '/_authenticated/command-words'
+      path: '/command-words'
+      fullPath: '/command-words'
+      preLoaderRoute: typeof AuthenticatedCommandWordsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/topic/$topicId': {
       id: '/_authenticated/topic/$topicId'
       path: '/topic/$topicId'
@@ -408,6 +428,7 @@ const AuthenticatedTopicTopicIdRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedCommandWordsRoute: typeof AuthenticatedCommandWordsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMockRoute: typeof AuthenticatedMockRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -417,6 +438,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedCommandWordsRoute: AuthenticatedCommandWordsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMockRoute: AuthenticatedMockRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
