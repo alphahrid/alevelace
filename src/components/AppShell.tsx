@@ -85,7 +85,7 @@ export function AppShell() {
         </div>
         <Outlet />
         {/* Mobile bottom nav */}
-        <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-4 border-t bg-background/95 backdrop-blur">
+        <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur">
           {nav.map((n) => {
             const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
             return (
