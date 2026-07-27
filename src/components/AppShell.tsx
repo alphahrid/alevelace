@@ -8,6 +8,7 @@ import { DonationButton } from "@/components/DonationModal";
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
   { to: "/subjects", label: "Subjects", icon: BookOpen },
+  { to: "/tutor", label: "AI Tutor", icon: Sparkles },
   { to: "/mock", label: "Mock exams", icon: Timer },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
