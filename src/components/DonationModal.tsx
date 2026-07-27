@@ -70,19 +70,14 @@ export function DonationButton({ variant = "ghost" }: { variant?: "ghost" | "out
           </TabsContent>
 
           <TabsContent value="card" className="mt-4">
-            <div className="rounded-lg border bg-card p-4 space-y-3">
-              <div className="text-sm text-muted-foreground">
-                International card payments (Visa / Mastercard / Amex) are coming soon.
+            <div className="rounded-lg border bg-card p-5 text-center space-y-3">
+              <div className="mx-auto size-10 rounded-full bg-primary/10 text-primary grid place-items-center">
+                <CreditCard className="size-5" />
               </div>
-              <div className="grid gap-2 opacity-60 pointer-events-none select-none">
-                <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="1234 5678 9012 3456" disabled />
-                <div className="grid grid-cols-2 gap-2">
-                  <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="MM / YY" disabled />
-                  <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="CVC" disabled />
-                </div>
-                <Button disabled>Donate</Button>
-              </div>
-              <div className="text-xs text-muted-foreground">In the meantime, bKash works worldwide via family/friends in Bangladesh.</div>
+              <div className="font-semibold">Online card donations via Stripe are coming soon!</div>
+              <p className="text-sm text-muted-foreground">
+                For now, please use the <span className="font-medium text-foreground">bKash</span> option — it works worldwide via family or friends in Bangladesh.
+              </p>
             </div>
           </TabsContent>
         </Tabs>

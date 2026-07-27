@@ -2,6 +2,8 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronRight } from "lucide-react";
+import { ExaminerTrapDoor } from "@/components/ExaminerTrapDoor";
+import { ReadAloud } from "@/components/ReadAloud";
 
 type Subject = { id: string; name: string; slug: string; color: string; description: string | null };
 type Topic = { id: string; name: string; slug: string; syllabus_ref: string | null; position: number };
@@ -32,10 +34,16 @@ function SubjectPage() {
       <Link to="/subjects" className="text-sm text-muted-foreground hover:text-foreground">← All subjects</Link>
       <div className="flex items-center gap-3 mt-2 mb-2">
         <div className="size-12 rounded-lg grid place-items-center font-bold text-xl" style={{ backgroundColor: subject.color + "22", color: subject.color }}>{subject.name[0]}</div>
-        <h1 className="text-3xl font-bold tracking-tight">{subject.name}</h1>
+        <h1 className="text-3xl font-bold tracking-tight flex-1">{subject.name}</h1>
+        {subject.description && <ReadAloud text={`${subject.name}. ${subject.description}`} label="Summary" />}
       </div>
-      <p className="text-muted-foreground mb-8">{subject.description}</p>
+      <p className="text-muted-foreground mb-6">{subject.description}</p>
 
+      <div className="mb-8">
+        <ExaminerTrapDoor subjectName={subject.name} />
+      </div>
+
+      <h2 className="text-lg font-semibold mb-3">Topics</h2>
       <div className="space-y-2">
         {topics.map((t) => (
           <Link

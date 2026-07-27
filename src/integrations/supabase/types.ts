@@ -596,7 +596,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      weekly_streak_leaderboard: {
+        Args: never
+        Returns: {
+          is_me: boolean
+          label: string
+          rank: number
+          streak: number
+        }[]
+      }
     }
     Enums: {
       exam_board: "cambridge" | "edexcel" | "both"
