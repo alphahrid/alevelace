@@ -91,9 +91,10 @@ export function AppShell() {
           </div>
         </div>
         <Outlet />
+        <AppFooter />
         {/* Mobile bottom nav */}
         <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur">
-          {nav.map((n) => {
+          {mobileNav.map((n) => {
             const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
             return (
               <Link key={n.to} to={n.to} className={cn("flex flex-col items-center gap-0.5 py-2 text-xs",
@@ -104,6 +105,7 @@ export function AppShell() {
             );
           })}
         </nav>
+
       </main>
     </div>
   );
