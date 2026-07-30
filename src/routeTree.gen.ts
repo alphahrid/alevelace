@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedSubjectsRouteImport } from './routes/_authenticated/subjects'
+import { Route as AuthenticatedSocialRouteImport } from './routes/_authenticated/social'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
@@ -67,6 +68,11 @@ const AuthenticatedTutorRoute = AuthenticatedTutorRouteImport.update({
 const AuthenticatedSubjectsRoute = AuthenticatedSubjectsRouteImport.update({
   id: '/subjects',
   path: '/subjects',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSocialRoute = AuthenticatedSocialRouteImport.update({
+  id: '/social',
+  path: '/social',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/mock': typeof AuthenticatedMockRouteWithChildren
   '/notes': typeof AuthenticatedNotesRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/social': typeof AuthenticatedSocialRoute
   '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
   '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/mock': typeof AuthenticatedMockRouteWithChildren
   '/notes': typeof AuthenticatedNotesRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/social': typeof AuthenticatedSocialRoute
   '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
   '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_authenticated/mock': typeof AuthenticatedMockRouteWithChildren
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/social': typeof AuthenticatedSocialRoute
   '/_authenticated/subjects': typeof AuthenticatedSubjectsRouteWithChildren
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/mock'
     | '/notes'
     | '/settings'
+    | '/social'
     | '/subjects'
     | '/tutor'
     | '/api/tutor'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/mock'
     | '/notes'
     | '/settings'
+    | '/social'
     | '/subjects'
     | '/tutor'
     | '/api/tutor'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mock'
     | '/_authenticated/notes'
     | '/_authenticated/settings'
+    | '/_authenticated/social'
     | '/_authenticated/subjects'
     | '/_authenticated/tutor'
     | '/api/tutor'
@@ -335,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/subjects'
       fullPath: '/subjects'
       preLoaderRoute: typeof AuthenticatedSubjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/social': {
+      id: '/_authenticated/social'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof AuthenticatedSocialRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings': {
@@ -473,6 +492,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMockRoute: typeof AuthenticatedMockRouteWithChildren
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSocialRoute: typeof AuthenticatedSocialRoute
   AuthenticatedSubjectsRoute: typeof AuthenticatedSubjectsRouteWithChildren
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedTopicTopicIdRoute: typeof AuthenticatedTopicTopicIdRouteWithChildren
@@ -485,6 +505,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMockRoute: AuthenticatedMockRouteWithChildren,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSocialRoute: AuthenticatedSocialRoute,
   AuthenticatedSubjectsRoute: AuthenticatedSubjectsRouteWithChildren,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedTopicTopicIdRoute: AuthenticatedTopicTopicIdRouteWithChildren,
