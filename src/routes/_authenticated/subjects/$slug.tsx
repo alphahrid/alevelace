@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { ChevronRight } from "lucide-react";
 import { ExaminerTrapDoor } from "@/components/ExaminerTrapDoor";
 import { ReadAloud } from "@/components/ReadAloud";
+import { LevelTabs } from "@/components/LevelTabs";
+import { levelsFor, type LevelFilter, type SyllabusLevel } from "@/lib/levels";
 
 type Subject = { id: string; name: string; slug: string; color: string; description: string | null };
-type Topic = { id: string; name: string; slug: string; syllabus_ref: string | null; position: number };
+type Topic = { id: string; name: string; slug: string; syllabus_ref: string | null; position: number; level: SyllabusLevel };
 
 export const Route = createFileRoute("/_authenticated/subjects/$slug")({
   component: SubjectPage,
@@ -16,6 +18,7 @@ function SubjectPage() {
   const { slug } = Route.useParams();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [filter, setFilter] = useState<LevelFilter>("full");
 
   useEffect(() => {
     (async () => {
@@ -43,9 +46,15 @@ function SubjectPage() {
         <ExaminerTrapDoor subjectName={subject.name} />
       </div>
 
-      <h2 className="text-lg font-semibold mb-3">Topics</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <h2 className="text-lg font-semibold">Topics</h2>
+        <LevelTabs value={filter} onChange={setFilter} />
+      </div>
       <div className="space-y-2">
-        {topics.map((t) => (
+        {topics.filter((t) => levelsFor(filter).includes(t.level)).length === 0 && (
+          <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground text-center">No topics for this level yet.</div>
+        )}
+        {topics.filter((t) => levelsFor(filter).includes(t.level)).map((t) => (
           <Link
             key={t.id}
             to="/topic/$topicId"
@@ -53,7 +62,10 @@ function SubjectPage() {
             className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 hover:border-primary/40 transition"
           >
             <div>
-              <div className="font-medium">{t.name}</div>
+              <div className="font-medium flex items-center gap-2">
+                {t.name}
+                <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{t.level}</span>
+              </div>
               {t.syllabus_ref && <div className="text-xs text-muted-foreground">{t.syllabus_ref}</div>}
             </div>
             <ChevronRight className="size-4 text-muted-foreground" />
