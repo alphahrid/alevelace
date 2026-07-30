@@ -1,17 +1,24 @@
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles, Timer } from "lucide-react";
+import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles, Timer, BookMarked, Trophy, Users } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DonationButton } from "@/components/DonationModal";
+import { AppFooter } from "@/components/AppFooter";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
   { to: "/subjects", label: "Subjects", icon: BookOpen },
+  { to: "/notes", label: "Notes", icon: BookMarked },
   { to: "/tutor", label: "AI Tutor", icon: Sparkles },
   { to: "/mock", label: "Mock exams", icon: Timer },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { to: "/social", label: "Study circle", icon: Users },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
+
+const mobileNav = nav.filter((n) => ["/dashboard", "/subjects", "/notes", "/tutor", "/leaderboard"].includes(n.to));
+
 
 export function AppShell() {
   const loc = useLocation();
