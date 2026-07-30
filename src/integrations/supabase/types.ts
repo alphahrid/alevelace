@@ -156,6 +156,66 @@ export type Database = {
           },
         ]
       }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          level: Database["public"]["Enums"]["syllabus_level"]
+          paper: string | null
+          subject_id: string | null
+          title: string
+          topic_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          level?: Database["public"]["Enums"]["syllabus_level"]
+          paper?: string | null
+          subject_id?: string | null
+          title: string
+          topic_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          level?: Database["public"]["Enums"]["syllabus_level"]
+          paper?: string | null
+          subject_id?: string | null
+          title?: string
+          topic_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       past_paper_scores: {
         Row: {
           board: Database["public"]["Enums"]["exam_board"]
@@ -200,28 +260,43 @@ export type Database = {
       }
       profiles: {
         Row: {
+          bio: string | null
           created_at: string
           display_name: string | null
           exam_boards: Database["public"]["Enums"]["exam_board"][]
           id: string
+          level_filter: string
           onboarded: boolean
+          readiness: number
           selected_subjects: string[]
+          updated_at: string
+          username: string | null
         }
         Insert: {
+          bio?: string | null
           created_at?: string
           display_name?: string | null
           exam_boards?: Database["public"]["Enums"]["exam_board"][]
           id: string
+          level_filter?: string
           onboarded?: boolean
+          readiness?: number
           selected_subjects?: string[]
+          updated_at?: string
+          username?: string | null
         }
         Update: {
+          bio?: string | null
           created_at?: string
           display_name?: string | null
           exam_boards?: Database["public"]["Enums"]["exam_board"][]
           id?: string
+          level_filter?: string
           onboarded?: boolean
+          readiness?: number
           selected_subjects?: string[]
+          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -465,6 +540,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          level: Database["public"]["Enums"]["syllabus_level"]
           name: string
           parent_id: string | null
           position: number
@@ -476,6 +552,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          level?: Database["public"]["Enums"]["syllabus_level"]
           name: string
           parent_id?: string | null
           position?: number
@@ -487,6 +564,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          level?: Database["public"]["Enums"]["syllabus_level"]
           name?: string
           parent_id?: string | null
           position?: number
@@ -596,6 +674,61 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_streaks: {
+        Args: never
+        Returns: {
+          streak: number
+          user_id: string
+        }[]
+      }
+      following_feed: {
+        Args: never
+        Returns: {
+          at: string
+          detail: string
+          kind: string
+          label: string
+          username: string
+        }[]
+      }
+      leaderboard: {
+        Args: { _friends?: boolean; _metric?: string }
+        Returns: {
+          is_me: boolean
+          label: string
+          rank: number
+          user_id: string
+          username: string
+          value: number
+        }[]
+      }
+      public_profile: {
+        Args: { _username: string }
+        Returns: {
+          bio: string
+          display_name: string
+          followers: number
+          following: number
+          is_following: boolean
+          is_me: boolean
+          joined: string
+          readiness: number
+          streak: number
+          user_id: string
+          username: string
+          week_minutes: number
+        }[]
+      }
+      search_profiles: {
+        Args: { _q: string }
+        Returns: {
+          display_name: string
+          is_following: boolean
+          readiness: number
+          user_id: string
+          username: string
+        }[]
+      }
       weekly_streak_leaderboard: {
         Args: never
         Returns: {
@@ -609,6 +742,7 @@ export type Database = {
     Enums: {
       exam_board: "cambridge" | "edexcel" | "both"
       question_type: "mcq" | "short"
+      syllabus_level: "as" | "a2"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -738,6 +872,7 @@ export const Constants = {
     Enums: {
       exam_board: ["cambridge", "edexcel", "both"],
       question_type: ["mcq", "short"],
+      syllabus_level: ["as", "a2"],
     },
   },
 } as const
