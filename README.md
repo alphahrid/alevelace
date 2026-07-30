@@ -1,20 +1,33 @@
-# A-Level Ace (02)
+# 🎓 A-Level Ace
 
-i want to build an app with which i can master any a level subjects , like theories and also the math types
+An interactive EdTech web application engineered to streamline study workflows, active recall, and syllabus mastery for Cambridge International A-Level students.
 
-This project was built with [Lovable](https://lovable.dev).
+---
 
-## Build with Lovable
+## 🚀 Impact & Live Demo
+* **Active Users:** Serving **50+ active Cambridge A-Level candidates**[cite: 6].
+* **Live Application:** [Insert your live app URL here]
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/ec269a6c-36a6-4595-8b56-e28c02bd637b).
+---
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## ✨ Key Features
+* **Syllabus Progress Tracker:** Interactive checklists directly mapped to CIE syllabus codes (Math 9709, Further Math 9231, Physics 9702, Chemistry 9701)[cite: 6].
+* **Study Workflows:** Integrated flashcard engine, leaderboards, and revision notes management system.
+* **Responsive UI:** Optimized for desktop and mobile study sessions.
 
-## Development
+---
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## 🛠️ Tech Stack
+* **Frontend:** React.js, TypeScript, Vite
+* **Backend & Database:** Supabase
+* **Styling:** Tailwind CSS
+* **Deployment & Tooling:** Cloudflare Workers / Wrangler, Bun
+
+---
+
+## 👨‍💻 Founder & Lead Developer
+**Tasfia Tahmid Hridita**  
+*A-Level Candidate | STEM & Technology Enthusiast*[cite: 6]
 
 ```sh
 git clone <this-repository-url>
