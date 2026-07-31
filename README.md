@@ -6,7 +6,7 @@ An interactive EdTech web application engineered to streamline study workflows, 
 
 ## 🚀 Impact & Live Demo
 * **Active Users:** Serving **50+ active Cambridge A-Level candidates**[cite: 6].
-* **Live Application:** [Insert your live app URL here]
+* **Live Application:** [https://alevelace.lovable.app]
 
 ---
 
