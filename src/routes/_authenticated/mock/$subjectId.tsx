@@ -10,6 +10,7 @@ import { Timer, ArrowLeft, Sparkles, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { generateMockExam } from "@/lib/mock.functions";
 import { gradeShortAnswer } from "@/lib/ai.functions";
+import { useBoard, BOARD_LABEL } from "@/lib/board";
 
 type Q = { id: string; type: "mcq" | "short"; prompt: string; choices: string[] | null; answer: string; explanation: string };
 type Result = { questionId: string; correct: boolean; score: number; userAnswer: string; feedback?: string };
@@ -34,6 +35,7 @@ function MockExam() {
   const [busy, setBusy] = useState(false);
   const startedAt = useRef<number>(0);
 
+  const { board } = useBoard();
   const gen = useServerFn(generateMockExam);
   const grade = useServerFn(gradeShortAnswer);
 
@@ -42,6 +44,14 @@ function MockExam() {
       setSubjectName((data as { name: string } | null)?.name || "");
     });
   }, [subjectId]);
+
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current || phase !== "intro") return;
+    autoStarted.current = true;
+    void start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (phase !== "exam") return;
@@ -57,7 +67,7 @@ function MockExam() {
   const start = async () => {
     setBusy(true);
     try {
-      const r = await gen({ data: { subjectId, count: 12 } });
+      const r = await gen({ data: { subjectId, count: 12, board } });
       setQuestions(r.questions as Q[]);
       setAttemptId(r.attemptId);
       setSecondsLeft((r.questions as Q[]).length * SECONDS_PER_Q);
@@ -122,7 +132,7 @@ function MockExam() {
         <h1 className="text-3xl font-bold tracking-tight mt-2">{subjectName} mock exam</h1>
         <div className="rounded-xl border bg-card p-6 mt-6 space-y-3">
           <div className="flex items-center gap-2 text-sm"><Timer className="size-4 text-primary" /> 12 questions · ~18 minutes</div>
-          <div className="text-sm text-muted-foreground">A full-board flavoured paper (Cambridge & Edexcel). Once you start, the timer runs — you can navigate freely between questions. AI marks every answer with feedback.</div>
+          <div className="text-sm text-muted-foreground">A {BOARD_LABEL[board]} flavoured paper generated from this subject's syllabus tree and your AI notes. Once you start, the timer runs — you can navigate freely between questions. AI marks every answer with feedback.</div>
           <Button onClick={start} disabled={busy} size="lg" className="mt-2"><Sparkles className="size-4 mr-2" />{busy ? "Preparing paper…" : "Start mock"}</Button>
         </div>
       </div>

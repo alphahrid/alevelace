@@ -674,6 +674,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      community_stats: {
+        Args: never
+        Returns: {
+          active_week: number
+          total: number
+        }[]
+      }
       current_streaks: {
         Args: never
         Returns: {

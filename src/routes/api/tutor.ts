@@ -2,7 +2,27 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-function buildSystemPrompt(boardLabel: string, topicContext?: string) {
+type PaperFocus = "mcq" | "theory" | "practical";
+
+const PAPER_GUIDANCE: Record<PaperFocus, string> = {
+  mcq: `## Paper focus: MULTIPLE CHOICE (Paper 1 / Unit 1 MCQs)
+- Optimise for **speed**: show the fastest route to the answer, not the long derivation.
+- Always name the **trap options** and explain precisely why each distractor is tempting and wrong.
+- Teach **elimination strategy**: units, orders of magnitude, sign, limiting cases, dimensional checks.
+- Give the **quick formula / shortcut** and a rough time budget (about 1.5 minutes per question).`,
+  theory: `## Paper focus: STRUCTURED THEORY (Paper 2 / Paper 4 / Units 2 & 4)
+- Answer in **mark-scheme bullet points**, one credit-worthy point per bullet, with the mark code (M1 / A1 / B1 / C1).
+- Foreground the **command word** (State, Describe, Explain, Compare, Calculate, Evaluate) and the depth it demands.
+- Use the exact **keywords** the board's mark scheme accepts; flag synonyms that are NOT accepted.
+- Finish with a compact model A* answer written the way the student should write it in the booklet.`,
+  practical: `## Paper focus: PRACTICAL / ALTERNATIVE TO PRACTICAL (Paper 3 / Paper 5 / Units 3 & 6)
+- Always identify **independent, dependent and control variables** explicitly.
+- Cover **sources of error** (systematic vs random), how to reduce them, and **safety precautions** with a reason.
+- Apply **graph rules**: sensible scales, axes with quantity/unit, line of best fit, gradient and intercept interpretation.
+- Handle **precision & uncertainties**: significant figures, absolute vs percentage uncertainty, combining uncertainties, error bars.`,
+};
+
+function buildSystemPrompt(boardLabel: string, topicContext?: string, paperFocus?: PaperFocus) {
   return `You are an expert A-Level tutor, examiner, and study coach for **${boardLabel}**.
 
 ## Marking & board awareness
@@ -20,6 +40,8 @@ function buildSystemPrompt(boardLabel: string, topicContext?: string) {
 - **Mathematics & sciences**: ALL equations MUST use KaTeX — inline \`$...$\`, display \`$$...$$\`. Never use \`\\(\\)\` or \`\\[\\]\`. Format derivations one step per line.
 - For essay subjects (History, Economics, Psychology, Business), use **PEEL/PEAL** structures and bold key technical terms.
 - Be concise and rigorous — no fluff.
+
+${paperFocus ? PAPER_GUIDANCE[paperFocus] : ""}
 
 ${topicContext ? `## Current A-Level topic\n${topicContext}` : ""}`;
 }
@@ -42,12 +64,12 @@ export const Route = createFileRoute("/api/tutor")({
         if (userErr || !userData.user) return new Response("Unauthorized", { status: 401 });
         const userId = userData.user.id;
 
-        const body = (await request.json()) as { conversationId: string; topicContext?: string; userMessage: string };
+        const body = (await request.json()) as { conversationId: string; topicContext?: string; userMessage: string; paperFocus?: PaperFocus; board?: "cambridge" | "edexcel" };
         if (!body.conversationId || !body.userMessage) return new Response("Bad request", { status: 400 });
 
         // Look up the student's preferred exam board(s)
         const { data: profile } = await sb.from("profiles").select("exam_boards").eq("id", userId).single();
-        const boards = (profile?.exam_boards as string[] | null) || ["both"];
+        const boards = body.board ? [body.board] : ((profile?.exam_boards as string[] | null) || ["both"]);
         const boardLabel = boards.includes("both") || boards.length > 1
           ? "Cambridge (CAIE) and Edexcel"
           : boards[0] === "cambridge" ? "Cambridge (CAIE)"
@@ -70,7 +92,7 @@ export const Route = createFileRoute("/api/tutor")({
           content: body.userMessage,
         });
 
-        const systemPrompt = buildSystemPrompt(boardLabel, body.topicContext);
+        const systemPrompt = buildSystemPrompt(boardLabel, body.topicContext, body.paperFocus);
         const messages = [
           { role: "system", content: systemPrompt },
           ...(history || []).map((m) => ({ role: m.role, content: m.content })),

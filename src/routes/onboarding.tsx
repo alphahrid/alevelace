@@ -19,7 +19,7 @@ function Onboarding() {
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [boards, setBoards] = useState<Set<"cambridge" | "edexcel">>(new Set(["cambridge", "edexcel"]));
+  const [board, setBoard] = useState<"cambridge" | "edexcel" | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -31,18 +31,13 @@ function Onboarding() {
     next.has(id) ? next.delete(id) : next.add(id);
     setSelected(next);
   };
-  const toggleBoard = (b: "cambridge" | "edexcel") => {
-    const next = new Set(boards);
-    next.has(b) ? next.delete(b) : next.add(b);
-    if (next.size === 0) return;
-    setBoards(next);
-  };
 
   const onSave = async () => {
+    if (!board) return toast.error("Choose your exam board — this is required");
     if (selected.size === 0) return toast.error("Pick at least one subject");
     setBusy(true);
     const { data: u } = await supabase.auth.getUser();
-    const examBoards = boards.size === 2 ? ["both"] : Array.from(boards);
+    const examBoards = [board];
     const { error } = await supabase.from("profiles").update({
       selected_subjects: Array.from(selected),
       exam_boards: examBoards as ("cambridge" | "edexcel" | "both")[],
@@ -67,17 +62,18 @@ function Onboarding() {
         </div>
 
         <section className="mb-8">
-          <h2 className="text-sm font-semibold mb-3">Exam boards</h2>
+          <h2 className="text-sm font-semibold mb-1">Exam board <span className="text-destructive">*</span></h2>
+          <p className="text-xs text-muted-foreground mb-3">Required — every note, tutor answer and mock paper is tailored to this board. You can switch it any time from the header.</p>
           <div className="grid grid-cols-2 gap-3">
             {(["cambridge", "edexcel"] as const).map((b) => (
               <button
                 key={b}
-                onClick={() => toggleBoard(b)}
-                className={`rounded-lg border p-4 text-left transition ${boards.has(b) ? "border-primary bg-primary/5" : "hover:bg-muted"}`}
+                onClick={() => setBoard(b)}
+                className={`rounded-lg border p-4 text-left transition ${board === b ? "border-primary bg-primary/5" : "hover:bg-muted"}`}
               >
                 <div className="flex items-center justify-between">
                   <span className="font-medium capitalize">{b}</span>
-                  {boards.has(b) && <Check className="size-4 text-primary" />}
+                  {board === b && <Check className="size-4 text-primary" />}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">{b === "cambridge" ? "CAIE / Cambridge International" : "Pearson Edexcel"}</p>
               </button>
@@ -108,7 +104,7 @@ function Onboarding() {
         </section>
 
         <div className="flex justify-end">
-          <Button onClick={onSave} disabled={busy} size="lg">Save & continue</Button>
+          <Button onClick={onSave} disabled={busy || !board || selected.size === 0} size="lg">Save & continue</Button>
         </div>
       </div>
     </div>

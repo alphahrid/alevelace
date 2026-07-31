@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { CommunityCounter } from "@/components/CommunityCounter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -194,6 +195,7 @@ function Dashboard() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back, {name}</h1>
         <p className="text-muted-foreground mt-1">Pick up where you left off.</p>
+        <div className="mt-4"><CommunityCounter /></div>
       </header>
 
       <section className="grid sm:grid-cols-3 gap-4 mb-6">

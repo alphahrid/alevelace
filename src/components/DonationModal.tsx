@@ -41,7 +41,7 @@ export function DonationButton({ variant = "ghost" }: { variant?: "ghost" | "out
 
           <TabsContent value="bkash" className="mt-4">
             <div className="rounded-lg border bg-card p-4">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">bKash Merchant / Personal</div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">bKash number</div>
               <div className="flex items-center justify-between gap-3">
                 <div className="text-2xl font-bold tracking-tight tabular-nums">{BKASH_NUMBER}</div>
                 <Button size="sm" variant="default" onClick={copy} className="gap-1.5 shrink-0">
@@ -50,7 +50,7 @@ export function DonationButton({ variant = "ghost" }: { variant?: "ghost" | "out
               </div>
               <ol className="mt-4 text-sm text-muted-foreground space-y-1.5 list-decimal list-inside">
                 <li>Open the bKash app.</li>
-                <li>Choose <span className="font-medium text-foreground">Send Money</span> or <span className="font-medium text-foreground">Merchant Pay</span>.</li>
+                <li>Choose <span className="font-medium text-foreground">Send Money</span> in your bKash app.</li>
                 <li>Enter the number above and the amount you'd like to give.</li>
                 <li>Confirm with your bKash PIN — that's it. Thank you 🙏</li>
               </ol>

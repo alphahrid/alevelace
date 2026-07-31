@@ -6,6 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Markdown } from "@/components/Markdown";
 import { Send, Sparkles, Atom, Calculator, FlaskConical, BookOpen, Landmark, Dna } from "lucide-react";
 import { toast } from "sonner";
+import { useBoard, BOARD_SHORT } from "@/lib/board";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type PaperFocus = "mcq" | "theory" | "practical";
+
+const PAPER_OPTIONS: Array<{ value: PaperFocus; label: string }> = [
+  { value: "mcq", label: "MCQ Paper (P1 / Unit 1)" },
+  { value: "theory", label: "Structured Theory (P2 / P4 / Units 2 & 4)" },
+  { value: "practical", label: "Practical / Alt-to-Practical (P3 / P5 / Units 3 & 6)" },
+];
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -33,6 +43,8 @@ function TutorPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [paperFocus, setPaperFocus] = useState<PaperFocus>("theory");
+  const { board } = useBoard();
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -84,7 +96,7 @@ function TutorPage() {
       const res = await fetch("/api/tutor", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
-        body: JSON.stringify({ conversationId, userMessage: userMsg.content }),
+        body: JSON.stringify({ conversationId, userMessage: userMsg.content, paperFocus, board }),
       });
       if (!res.ok || !res.body) {
         const j = await res.json().catch(() => ({ error: "Error" }));
@@ -147,7 +159,20 @@ function TutorPage() {
         </div>
         <div>
           <div className="font-semibold">AI Tutor</div>
-          <div className="text-xs text-muted-foreground">Board-aware · Socratic · Markdown & KaTeX</div>
+          <div className="text-xs text-muted-foreground">{BOARD_SHORT[board]} · Socratic · Markdown &amp; KaTeX</div>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="hidden sm:inline text-xs text-muted-foreground">Paper focus</span>
+          <Select value={paperFocus} onValueChange={(v) => setPaperFocus(v as PaperFocus)}>
+            <SelectTrigger className="w-[190px] sm:w-[260px] h-9 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PAPER_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value} className="text-xs">{o.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </header>
 
