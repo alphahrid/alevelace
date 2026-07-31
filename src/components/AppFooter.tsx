@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { GraduationCap } from "lucide-react";
+import { InstagramBanner } from "@/components/InstagramBanner";
 
 export function AppFooter() {
   return (
@@ -13,6 +14,9 @@ export function AppFooter() {
       <p className="text-sm font-medium">
         Founded by Tasfia Tahmid Hridita <span className="text-muted-foreground">| Founder &amp; Lead Developer</span>
       </p>
+      <div className="mt-3 flex justify-center">
+        <InstagramBanner compact />
+      </div>
       <p className="text-xs text-muted-foreground mt-2">
         Built for Cambridge (CAIE) &amp; Edexcel A-Level students · <Link to="/about" className="hover:text-foreground underline underline-offset-2">About</Link>
       </p>

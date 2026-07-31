@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DonationButton } from "@/components/DonationModal";
 import { AppFooter } from "@/components/AppFooter";
+import { BoardProvider } from "@/lib/board";
+import { BoardToggle } from "@/components/BoardToggle";
+
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
@@ -25,6 +28,7 @@ export function AppShell() {
   const navigate = useNavigate();
 
   return (
+    <BoardProvider>
     <div className="min-h-screen flex bg-background text-foreground">
       <aside className="hidden md:flex w-60 flex-col border-r bg-sidebar text-sidebar-foreground">
         <div className="px-6 py-5 flex items-center gap-2 border-b border-sidebar-border">
@@ -35,6 +39,10 @@ export function AppShell() {
             <div className="font-semibold tracking-tight">A-Level Ace</div>
             <div className="text-xs text-muted-foreground">Master every subject</div>
           </div>
+        </div>
+        <div className="px-3 pt-3 flex items-center justify-between gap-2">
+          <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Exam board</span>
+          <BoardToggle />
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {nav.map((n) => {
@@ -86,6 +94,7 @@ export function AppShell() {
             A-Level Ace
           </Link>
           <div className="flex items-center gap-1">
+            <BoardToggle />
             <DonationButton />
             <ThemeToggle />
           </div>
@@ -108,5 +117,6 @@ export function AppShell() {
 
       </main>
     </div>
+    </BoardProvider>
   );
 }

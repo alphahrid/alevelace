@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, BookMarked, ListChecks, Timer } from "lucide-react";
 import { ExaminerTrapDoor } from "@/components/ExaminerTrapDoor";
 import { ReadAloud } from "@/components/ReadAloud";
 import { LevelTabs } from "@/components/LevelTabs";
@@ -30,6 +30,9 @@ function SubjectPage() {
     })();
   }, [slug]);
 
+  const visibleTopics = topics.filter((t) => levelsFor(filter).includes(t.level));
+  const firstTopic = visibleTopics[0];
+
   if (!subject) return <div className="p-8">Loading…</div>;
 
   return (
@@ -42,9 +45,29 @@ function SubjectPage() {
       </div>
       <p className="text-muted-foreground mb-6">{subject.description}</p>
 
+      <section className="grid sm:grid-cols-3 gap-3 mb-8">
+        <Link to="/notes" className="rounded-xl border bg-card p-4 hover:border-primary/40 transition">
+          <div className="flex items-center gap-2 font-medium text-sm"><BookMarked className="size-4 text-primary" /> Generate / view AI notes</div>
+          <p className="text-xs text-muted-foreground mt-1">AS &amp; A2 chapter chunks in mark-scheme wording.</p>
+        </Link>
+        {firstTopic ? (
+          <Link to="/topic/$topicId/quiz" params={{ topicId: firstTopic.id }} className="rounded-xl border bg-card p-4 hover:border-primary/40 transition">
+            <div className="flex items-center gap-2 font-medium text-sm"><ListChecks className="size-4 text-primary" /> Take topic quiz</div>
+            <p className="text-xs text-muted-foreground mt-1">Starts with {firstTopic.name}.</p>
+          </Link>
+        ) : (
+          <div className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">No topics for this level yet.</div>
+        )}
+        <Link to="/mock/$subjectId" params={{ subjectId: subject.id }} className="rounded-xl border bg-card p-4 hover:border-primary/40 transition">
+          <div className="flex items-center gap-2 font-medium text-sm"><Timer className="size-4 text-primary" /> Start subject mock exam</div>
+          <p className="text-xs text-muted-foreground mt-1">Timed, board-tailored, AI-marked.</p>
+        </Link>
+      </section>
+
       <div className="mb-8">
         <ExaminerTrapDoor subjectName={subject.name} />
       </div>
+
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h2 className="text-lg font-semibold">Topics</h2>

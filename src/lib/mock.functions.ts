@@ -39,14 +39,26 @@ export const generateMockExam = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: subject } = await supabase.from("subjects").select("name").eq("id", data.subjectId).single();
-    const { data: topics } = await supabase.from("topics").select("id, name").eq("subject_id", data.subjectId).limit(20);
+    const { data: topics } = await supabase.from("topics").select("id, name, syllabus_ref, level").eq("subject_id", data.subjectId).order("position").limit(30);
+    const { data: notes } = await supabase
+      .from("notes")
+      .select("title, content")
+      .eq("user_id", userId)
+      .eq("subject_id", data.subjectId)
+      .order("updated_at", { ascending: false })
+      .limit(4);
+    const noteContext = (notes || [])
+      .map((n: { title: string; content: string }) => `### ${n.title}\n${(n.content || "").slice(0, 1200)}`)
+      .join("\n\n");
     if (!subject) throw new Error("Subject not found");
-    const topicList = (topics || []).map((t: { name: string }) => t.name).join(", ") || "core syllabus";
+    const topicList = (topics || [])
+      .map((t: { name: string; syllabus_ref: string | null; level: string }) => `${t.name} [${String(t.level).toUpperCase()}${t.syllabus_ref ? ` · ${t.syllabus_ref}` : ""}]`)
+      .join("; ") || "core syllabus";
 
     const result = await callAIJSON(
       [
         { role: "system", content: `You write realistic A-Level mock-exam questions in the style of **${data.board === "both" ? "Cambridge (CAIE) and Edexcel" : data.board === "cambridge" ? "Cambridge (CAIE)" : "Edexcel"}**, blending MCQ and short-answer items across the whole syllabus. Use authentic A-Level command words ("State", "Describe", "Explain", "Calculate", "Derive", "Evaluate"). For maths/sciences, ALL equations MUST use KaTeX ($...$ inline, $$...$$ display). Model answers and explanations MUST read like a board mark scheme (list mark points M1/A1/B1, units required, accept-list of equivalent answers).` },
-        { role: "user", content: `Build a ${data.count}-question A-Level mock paper for the subject "${(subject as { name: string }).name}". Cover broadly: ${topicList}. Exam board flavour: ${data.board}. ~50% MCQ, ~50% short answer. For MCQ, the answer must exactly match one of the choices.` },
+        { role: "user", content: `Build a ${data.count}-question A-Level mock paper for the subject "${(subject as { name: string }).name}". Cover broadly: ${topicList}. Exam board flavour: ${data.board}. ~50% MCQ, ~50% short answer. For MCQ, the answer must exactly match one of the choices.${noteContext ? `\n\nThe student has revised from these AI notes — pull questions from this material where possible:\n${noteContext}` : ""}` },
       ],
       {
         name: "create_mock",
