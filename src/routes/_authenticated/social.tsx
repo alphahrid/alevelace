@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, Search, UserPlus, UserCheck, Activity, Flame } from "lucide-react";
+import { Users, Search, UserPlus, UserCheck, Activity, Flame, Swords } from "lucide-react";
+import { InstagramBanner } from "@/components/InstagramBanner";
+import { CommunityCounter } from "@/components/CommunityCounter";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -61,12 +63,37 @@ function SocialPage() {
     setResults((rs) => rs.map((r) => (r.user_id === row.user_id ? { ...r, is_following: !r.is_following } : r)));
   };
 
+  const challenge = async (row: SearchRow) => {
+    const link = `${window.location.origin}/mock`;
+    try {
+      await navigator.clipboard.writeText(`I'm challenging you to a 1v1 A-Level Ace quiz! Beat my score: ${link}`);
+      toast.success(`Challenge link copied — DM it to @${row.username}`, {
+        description: "Both of you take the same subject mock, then compare scores on the leaderboard.",
+      });
+    } catch {
+      toast.error("Couldn't copy the challenge link");
+    }
+  };
+
   return (
     <div className="p-6 sm:p-8 max-w-3xl mx-auto">
       <header className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2"><Users className="size-7 text-primary" /> Study circle</h1>
         <p className="text-muted-foreground mt-1">Follow peers and watch their revision streaks in real time.</p>
+        <div className="mt-4"><CommunityCounter /></div>
       </header>
+
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            placeholder="Search students by @username…"
+            value={q}
+            onChange={(e) => { setQ(e.target.value); setTab("discover"); }}
+          />
+        </div>
+      </div>
 
       <div className="inline-flex rounded-lg border bg-muted/40 p-1 mb-6">
         {(["following", "discover"] as const).map((t) => (
@@ -79,10 +106,6 @@ function SocialPage() {
 
       {tab === "discover" ? (
         <section>
-          <div className="relative mb-4">
-            <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search students by name or @username…" value={q} onChange={(e) => setQ(e.target.value)} />
-          </div>
           {results.length === 0 ? (
             <div className="rounded-xl border bg-card py-12 text-center text-sm text-muted-foreground">No students found.</div>
           ) : (
@@ -98,9 +121,14 @@ function SocialPage() {
                     </Link>
                     <div className="text-xs text-muted-foreground">@{r.username} · {Math.round(r.readiness || 0)}% A* readiness</div>
                   </div>
-                  <Button size="sm" variant={r.is_following ? "outline" : "default"} onClick={() => void toggleFollow(r)}>
-                    {r.is_following ? <><UserCheck className="size-4 mr-1" /> Following</> : <><UserPlus className="size-4 mr-1" /> Follow</>}
-                  </Button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button size="sm" variant={r.is_following ? "outline" : "default"} onClick={() => void toggleFollow(r)}>
+                      {r.is_following ? <><UserCheck className="size-4 mr-1" /> Following</> : <><UserPlus className="size-4 mr-1" /> Follow</>}
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => void challenge(r)}>
+                      <Swords className="size-4 mr-1" /> Challenge
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -134,6 +162,10 @@ function SocialPage() {
           )}
         </section>
       )}
+
+      <div className="mt-8">
+        <InstagramBanner />
+      </div>
     </div>
   );
 }
