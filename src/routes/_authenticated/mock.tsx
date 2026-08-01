@@ -47,7 +47,7 @@ function MockIndex() {
           <div key={s.id} className="rounded-xl border bg-card p-5">
             <div className="size-10 rounded-md mb-3 grid place-items-center font-bold" style={{ backgroundColor: s.color + "22", color: s.color }}>{s.name[0]}</div>
             <div className="font-semibold">{s.name}</div>
-            <p className="text-xs text-muted-foreground mt-1 mb-4">12-question timed mock — Cambridge & Edexcel flavoured.</p>
+            <p className="text-xs text-muted-foreground mt-1 mb-4">Build a custom paper — choose topics, question count and MCQ / Theory / Practical.</p>
             <Link to="/mock/$subjectId" params={{ subjectId: s.id }}>
               <Button size="sm" className="w-full">Start mock <ArrowRight className="size-4 ml-1" /></Button>
             </Link>
