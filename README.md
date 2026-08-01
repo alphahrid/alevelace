@@ -11,14 +11,15 @@ An interactive EdTech web application engineered to streamline study workflows, 
 ---
 
 ## ✨ Key Features
-* **Syllabus Progress Tracker:** Interactive checklists directly mapped to CIE syllabus codes (Math 9709, Further Math 9231, Physics 9702, Chemistry 9701)[cite: 6].
+* **Syllabus Progress Tracker:** Interactive checklists directly mapped to CIE syllabus codes (Math 9709, Further Math 9231, Physics 9702, Chemistry 9701, Business and Computer Science)[cite: 6].
 * **Study Workflows:** Integrated flashcard engine, leaderboards, and revision notes management system.
 * **Responsive UI:** Optimized for desktop and mobile study sessions.
 
 ---
 
 ## 🛠️ Tech Stack
-* **Frontend:** React.js, TypeScript, Vite
+* **Frontend:** 
+TypeScript,PLpgSQL and others
 * **Backend & Database:** Supabase
 * **Styling:** Tailwind CSS
 * **Deployment & Tooling:** Cloudflare Workers / Wrangler, Bun
@@ -30,8 +31,8 @@ An interactive EdTech web application engineered to streamline study workflows, 
 *A-Level Candidate | STEM & Technology Enthusiast*[cite: 6]
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
+git clone <github.com/alphahrld/alevelace>
+cd <alevelace>
 npm i
 npm run dev
 ```
