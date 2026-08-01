@@ -116,7 +116,11 @@ function NotesHub() {
         {/* Chapter tree */}
         <div className="space-y-4">
           {subjects.length === 0 && (
-            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">No subjects available.</div>
+            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
+              {noneSelected ? (
+                <>Pick your subjects in <Link to="/subjects" className="text-primary hover:underline">Subjects</Link> and they'll appear here.</>
+              ) : "No subjects available."}
+            </div>
           )}
           {subjects.map((s) => {
             const subTopics = visibleTopics.filter((t) => t.subject_id === s.id);
