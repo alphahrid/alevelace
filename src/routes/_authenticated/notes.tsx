@@ -30,8 +30,6 @@ export const Route = createFileRoute("/_authenticated/notes")({
   component: NotesHub,
 });
 
-const CORE_SLUG_HINTS = ["physics", "chemistry", "biology", "math", "further"];
-
 function NotesHub() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -40,15 +38,21 @@ function NotesHub() {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [active, setActive] = useState<Note | null>(null);
   const [busyTopic, setBusyTopic] = useState<string | null>(null);
+  const [noneSelected, setNoneSelected] = useState(false);
 
   const gen = useServerFn(generateNote);
 
   const load = async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const { data: subs } = await supabase.from("subjects").select("id, slug, name, color").order("name");
-    const list = ((subs as Subject[]) || []).filter((s) => CORE_SLUG_HINTS.some((h) => s.slug.includes(h) || s.name.toLowerCase().includes(h)));
-    const finalSubs = list.length ? list : ((subs as Subject[]) || []);
+    const { data: prof } = await supabase.from("profiles").select("selected_subjects").eq("id", u.user.id).maybeSingle();
+    const chosen: string[] = ((prof as { selected_subjects: string[] } | null)?.selected_subjects) || [];
+    setNoneSelected(chosen.length === 0);
+    let finalSubs: Subject[] = [];
+    if (chosen.length) {
+      const { data: subs } = await supabase.from("subjects").select("id, slug, name, color").in("id", chosen).order("name");
+      finalSubs = (subs as Subject[]) || [];
+    }
     setSubjects(finalSubs);
     if (finalSubs.length) {
       const { data: tps } = await supabase
@@ -112,7 +116,11 @@ function NotesHub() {
         {/* Chapter tree */}
         <div className="space-y-4">
           {subjects.length === 0 && (
-            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">No subjects available.</div>
+            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
+              {noneSelected ? (
+                <>Pick your subjects in <Link to="/subjects" className="text-primary hover:underline">Subjects</Link> and they'll appear here.</>
+              ) : "No subjects available."}
+            </div>
           )}
           {subjects.map((s) => {
             const subTopics = visibleTopics.filter((t) => t.subject_id === s.id);

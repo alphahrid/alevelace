@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, ChevronRight } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -60,41 +60,35 @@ function Subjects() {
         {subjects.map((s) => {
           const on = selected.includes(s.id);
           return (
-            <div
+            <button
               key={s.id}
+              type="button"
+              aria-pressed={on}
+              onClick={() => void toggle(s.id)}
               className={cn(
-                "rounded-xl border bg-card p-5 transition relative",
+                "rounded-xl border bg-card p-5 text-left transition",
                 on ? "border-primary ring-1 ring-primary/30 bg-primary/[0.03]" : "hover:border-primary/40"
               )}
             >
-              <button type="button" onClick={() => void toggle(s.id)} className="w-full text-left" aria-pressed={on}>
-                <div className="flex items-start justify-between">
-                  <div className="size-10 rounded-md mb-3 grid place-items-center font-bold" style={{ backgroundColor: s.color + "22", color: s.color }}>
-                    {s.name[0]}
-                  </div>
-                  <span
-                    className={cn(
-                      "size-6 rounded-full grid place-items-center border text-xs",
-                      on ? "bg-primary text-primary-foreground border-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    {on && <Check className="size-4" />}
-                  </span>
+              <div className="flex items-start justify-between">
+                <div className="size-10 rounded-md mb-3 grid place-items-center font-bold" style={{ backgroundColor: s.color + "22", color: s.color }}>
+                  {s.name[0]}
                 </div>
-                <div className="font-semibold">{s.name}</div>
-                <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{s.description}</div>
-                <div className={cn("text-[11px] font-medium mt-2", on ? "text-primary" : "text-muted-foreground")}>
-                  {on ? "Selected" : "Tap to select"}
-                </div>
-              </button>
-              <Link
-                to="/subjects/$slug"
-                params={{ slug: s.slug }}
-                className="mt-3 flex items-center justify-between text-sm font-medium text-primary hover:underline"
-              >
-                Open subject hub <ChevronRight className="size-4" />
-              </Link>
-            </div>
+                <span
+                  className={cn(
+                    "size-6 rounded-full grid place-items-center border text-xs",
+                    on ? "bg-primary text-primary-foreground border-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {on && <Check className="size-4" />}
+                </span>
+              </div>
+              <div className="font-semibold">{s.name}</div>
+              <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{s.description}</div>
+              <div className={cn("text-[11px] font-medium mt-2", on ? "text-primary" : "text-muted-foreground")}>
+                {on ? "Selected" : "Tap to select"}
+              </div>
+            </button>
           );
         })}
       </div>

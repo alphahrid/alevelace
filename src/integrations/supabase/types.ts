@@ -264,6 +264,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           exam_boards: Database["public"]["Enums"]["exam_board"][]
+          exam_date: string | null
           id: string
           level_filter: string
           onboarded: boolean
@@ -277,6 +278,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           exam_boards?: Database["public"]["Enums"]["exam_board"][]
+          exam_date?: string | null
           id: string
           level_filter?: string
           onboarded?: boolean
@@ -290,6 +292,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           exam_boards?: Database["public"]["Enums"]["exam_board"][]
+          exam_date?: string | null
           id?: string
           level_filter?: string
           onboarded?: boolean
