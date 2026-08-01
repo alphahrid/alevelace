@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CommunityCounter } from "@/components/CommunityCounter";
+import { ExamCountdown } from "@/components/ExamCountdown";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -203,6 +204,10 @@ function Dashboard() {
         <Stat icon={Layers} label="Cards due today" value={`${dueCount}`} tint="bg-primary/10 text-primary" />
         <Stat icon={ClipboardCheck} label="Minutes today" value={`${minutesToday}`} tint="bg-success/15 text-success-foreground" />
       </section>
+
+      <ExamCountdown />
+
+
 
       {/* Spaced Repetition Smart Alert */}
       {dueCount > 0 && (
