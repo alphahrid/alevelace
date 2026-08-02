@@ -1,8 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Timer, ArrowRight } from "lucide-react";
+import { filterSelectedSubjects } from "@/lib/subject-filter";
 
 type Subject = { id: string; slug: string; name: string; color: string };
 type Attempt = { id: string; subject_id: string | null; score: number; total: number; started_at: string; finished_at: string | null };
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/mock")({
 });
 
 function MockIndex() {
+  const navigate = useNavigate();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
 
@@ -23,7 +25,7 @@ function MockIndex() {
       const { data: prof } = await supabase.from("profiles").select("selected_subjects").eq("id", u.user.id).single();
       if (prof?.selected_subjects?.length) {
         const { data: subs } = await supabase.from("subjects").select("*").in("id", prof.selected_subjects);
-        setSubjects((subs as Subject[]) || []);
+        setSubjects(filterSelectedSubjects((subs as Subject[]) || [], prof.selected_subjects));
       }
       const { data: at } = await supabase.from("quiz_attempts").select("*").eq("user_id", u.user.id).eq("mode", "mock").order("started_at", { ascending: false }).limit(10);
       setAttempts((at as Attempt[]) || []);
@@ -48,9 +50,13 @@ function MockIndex() {
             <div className="size-10 rounded-md mb-3 grid place-items-center font-bold" style={{ backgroundColor: s.color + "22", color: s.color }}>{s.name[0]}</div>
             <div className="font-semibold">{s.name}</div>
             <p className="text-xs text-muted-foreground mt-1 mb-4">Build a custom paper — choose topics, question count and MCQ / Theory / Practical.</p>
-            <Link to="/mock/$subjectId" params={{ subjectId: s.id }}>
-              <Button size="sm" className="w-full">Start mock <ArrowRight className="size-4 ml-1" /></Button>
-            </Link>
+            <Button
+              size="sm"
+              className="w-full"
+              onClick={() => navigate({ to: "/mock/$subjectId", params: { subjectId: s.id } })}
+            >
+              Start mock <ArrowRight className="size-4 ml-1" />
+            </Button>
           </div>
         ))}
       </section>
