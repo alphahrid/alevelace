@@ -16,6 +16,7 @@ import { LevelTabs } from "@/components/LevelTabs";
 import { exportExamPdf } from "@/lib/print-exam";
 import type { LevelFilter, SyllabusLevel } from "@/lib/levels";
 import { levelsFor } from "@/lib/levels";
+import { gradeFor, percentFor } from "@/lib/mock-grade";
 import { cn } from "@/lib/utils";
 
 type Q = { id: string; type: "mcq" | "short"; prompt: string; choices: string[] | null; answer: string; explanation: string };
