@@ -75,19 +75,51 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "A-Level Ace" },
+      {
+        name: "description",
+        content:
+          "A-Level Ace is an AI revision platform with tutoring, flashcards, quizzes and timed mock exams for Cambridge and Edexcel A-Level students.",
+      },
+      { name: "author", content: "Tasfia Tahmid Hridita" },
+      { property: "og:site_name", content: "A-Level Ace" },
+      { property: "og:title", content: "A-Level Ace" },
+      {
+        property: "og:description",
+        content:
+          "AI tutoring, spaced-repetition flashcards, quizzes and mock exams for CIE and Edexcel A-Levels.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://alevelace.lovable.app/#organization",
+              name: "A-Level Ace",
+              url: "https://alevelace.lovable.app",
+              founder: { "@type": "Person", name: "Tasfia Tahmid Hridita" },
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://alevelace.lovable.app/#website",
+              name: "A-Level Ace",
+              url: "https://alevelace.lovable.app",
+              publisher: { "@id": "https://alevelace.lovable.app/#organization" },
+            },
+          ],
+        }),
       },
     ],
   }),
