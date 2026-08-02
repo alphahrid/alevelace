@@ -10,9 +10,11 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "A-Level Ace is an AI revision platform for Cambridge and Edexcel A-Level students, founded by Tasfia Tahmid Hridita." },
       { property: "og:title", content: "About A-Level Ace" },
       { property: "og:description", content: "AI tutoring, spaced repetition, mock exams and study vaults for AS and A2 students." },
+      { property: "og:url", content: "/about" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://alevelace.lovable.app/about" }],
   }),
   component: AboutPage,
 });

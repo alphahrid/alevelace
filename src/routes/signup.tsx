@@ -9,7 +9,25 @@ import { toast } from "sonner";
 import { GraduationCap } from "lucide-react";
 
 export const Route = createFileRoute("/signup")({
-  head: () => ({ meta: [{ title: "Create account — A-Level Ace" }] }),
+  head: () => ({
+    meta: [
+      { title: "Create account — A-Level Ace" },
+      {
+        name: "description",
+        content:
+          "Create a free A-Level Ace account to get an AI tutor, spaced-repetition flashcards, quizzes and mock exams for CIE and Edexcel A-Levels.",
+      },
+      { property: "og:title", content: "Create your A-Level Ace account" },
+      {
+        property: "og:description",
+        content: "Start revising smarter with AI tutoring, flashcards and timed mock exams.",
+      },
+      { property: "og:url", content: "/signup" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+    links: [{ rel: "canonical", href: "https://alevelace.lovable.app/signup" }],
+  }),
   component: Signup,
 });
 

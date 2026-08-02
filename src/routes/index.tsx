@@ -11,6 +11,43 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "AI tutor, smart flashcards, exam-style quizzes and mock papers for Cambridge and Edexcel A-Levels." },
       { property: "og:title", content: "A-Level Ace" },
       { property: "og:description", content: "Master A-Levels with AI tutoring, flashcards and quizzes." },
+      { property: "og:url", content: "/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+    links: [{ rel: "canonical", href: "https://alevelace.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "A-Level subjects on A-Level Ace",
+          itemListElement: [
+            "Physics",
+            "Chemistry",
+            "Biology",
+            "Business",
+            "Computer Science",
+            "Mathematics",
+            "Further Mathematics",
+          ].map((subject, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": "Course",
+              name: `A-Level ${subject}`,
+              description: `AI-guided AS and A2 ${subject} revision with notes, flashcards, quizzes and mock exams for CIE and Edexcel.`,
+              educationalLevel: "A-Level (AS & A2)",
+              provider: {
+                "@type": "Organization",
+                name: "A-Level Ace",
+                url: "https://alevelace.lovable.app",
+              },
+            },
+          })),
+        }),
+      },
     ],
   }),
   component: Landing,
