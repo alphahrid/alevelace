@@ -31,7 +31,7 @@ function md(s: string): string {
     .replace(/\n/g, "<br/>");
 }
 
-export function exportExamPdf(opts: {
+export type ExamPdfOptions = {
   title: string;
   subject?: string;
   board?: string;
@@ -40,12 +40,16 @@ export function exportExamPdf(opts: {
   score?: number | null;
   total?: number | null;
   grade?: string | null;
-}) {
+};
+
+/** Pure builder — returns the print-ready A4 HTML document for a paper. */
+export function buildExamHtml(opts: ExamPdfOptions): string {
   const { title, subject, board, questions, includeMarkScheme = true, score, total, grade } = opts;
   const now = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
   const html = `<!doctype html>
 <html lang="en">
+
 <head>
 <meta charset="utf-8"/>
 <title>${escapeHtml(title)}</title>
