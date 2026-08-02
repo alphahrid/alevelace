@@ -361,7 +361,13 @@ function MockExam() {
         <div className={`tabular-nums font-mono text-lg font-bold px-3 py-1 rounded-md ${secondsLeft < 60 ? "bg-destructive/15 text-destructive-foreground" : "bg-primary/10 text-primary"}`}>
           {mm}:{ss}
         </div>
-        <Button size="sm" variant="outline" onClick={() => { if (confirm("Submit paper now?")) void submit(); }} disabled={phase !== "exam"}>Submit</Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => printPaper(true)} title="Print or save this paper as a PDF">
+            <Printer className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Print / Save as PDF</span>
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => { if (confirm("Submit paper now?")) void submit(); }} disabled={phase !== "exam"}>Submit</Button>
+        </div>
+
       </div>
 
       <Progress value={((idx + 1) / questions.length) * 100} className="mb-4" />
