@@ -136,7 +136,12 @@ ${includeMarkScheme ? `
 </script>
 </body>
 </html>`;
+  return html;
+}
 
+/** Opens the printable paper in a new window and triggers the print dialog. */
+export function exportExamPdf(opts: ExamPdfOptions) {
+  const html = buildExamHtml(opts);
   const w = window.open("", "_blank", "width=900,height=1100");
   if (!w) {
     alert("Please allow pop-ups to export the printable paper.");
@@ -146,3 +151,4 @@ ${includeMarkScheme ? `
   w.document.write(html);
   w.document.close();
 }
+
