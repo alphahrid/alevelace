@@ -214,7 +214,7 @@ function MockExam() {
   };
 
   const totalScore = useMemo(() => results.reduce((a, r) => a + r.score, 0), [results]);
-  const pct = questions.length ? Math.round((totalScore / questions.length) * 100) : 0;
+  const pct = percentFor(totalScore, questions.length);
   const gradeInfo = gradeFor(pct, levelFilter);
 
   // ---------- setup / builder ----------
