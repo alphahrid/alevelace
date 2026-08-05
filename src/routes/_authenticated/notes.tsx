@@ -7,9 +7,10 @@ import { Markdown } from "@/components/Markdown";
 import { ReadAloud } from "@/components/ReadAloud";
 import { LevelTabs } from "@/components/LevelTabs";
 import { generateNote } from "@/lib/notes.functions";
+import { flashcardsFromNote } from "@/lib/flashcards.functions";
 import type { LevelFilter, SyllabusLevel } from "@/lib/levels";
 import { levelsFor } from "@/lib/levels";
-import { BookMarked, ChevronDown, ChevronRight, Sparkles, Trash2 } from "lucide-react";
+import { BookMarked, ChevronDown, ChevronRight, Sparkles, Trash2, Layers } from "lucide-react";
 import { toast } from "sonner";
 
 type Subject = { id: string; slug: string; name: string; color: string };
@@ -24,8 +25,10 @@ export const Route = createFileRoute("/_authenticated/notes")({
       { property: "og:title", content: "Study Vaults — AI A-Level Notes" },
       { property: "og:description", content: "Collapsible AS/A2 chapter trees with mark-scheme-accurate notes and KaTeX formulae." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://alevelace.lovable.app/notes" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://alevelace.lovable.app/notes" }],
   }),
   component: NotesHub,
 });
@@ -41,6 +44,20 @@ function NotesHub() {
   const [noneSelected, setNoneSelected] = useState(false);
 
   const gen = useServerFn(generateNote);
+  const toCards = useServerFn(flashcardsFromNote);
+  const [convertingNote, setConvertingNote] = useState<string | null>(null);
+
+  const turnIntoFlashcards = async (noteId: string) => {
+    setConvertingNote(noteId);
+    try {
+      const r = await toCards({ data: { noteId } });
+      toast.success(`${r.created} flashcards added — study them in Flashcards.`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not build flashcards");
+    } finally {
+      setConvertingNote(null);
+    }
+  };
 
   const load = async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -200,6 +217,16 @@ function NotesHub() {
                 </div>
                 <div className="flex items-center gap-1">
                   <ReadAloud text={active.content} label="Listen" />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={convertingNote === active.id}
+                    aria-label={`Turn ${active.title} into flashcards`}
+                    onClick={() => void turnIntoFlashcards(active.id)}
+                  >
+                    <Layers className="size-4 mr-1.5" />
+                    {convertingNote === active.id ? "Building…" : "Turn into flashcards"}
+                  </Button>
                   {active.topic_id && (
                     <Link to="/topic/$topicId" params={{ topicId: active.topic_id }}>
                       <Button size="sm" variant="outline">Open topic</Button>
