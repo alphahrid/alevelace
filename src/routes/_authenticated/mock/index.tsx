@@ -8,7 +8,7 @@ import { filterSelectedSubjects } from "@/lib/subject-filter";
 type Subject = { id: string; slug: string; name: string; color: string };
 type Attempt = { id: string; subject_id: string | null; score: number; total: number; started_at: string; finished_at: string | null };
 
-export const Route = createFileRoute("/_authenticated/mock")({
+export const Route = createFileRoute("/_authenticated/mock/")({
   head: () => ({ meta: [{ title: "Mock exams — A-Level Ace" }] }),
   component: MockIndex,
 });

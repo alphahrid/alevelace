@@ -6,7 +6,7 @@ import { MessageSquareText, Layers, ClipboardCheck, ArrowRight } from "lucide-re
 type Topic = { id: string; name: string; syllabus_ref: string | null; subject_id: string };
 type Subject = { id: string; name: string; slug: string; color: string };
 
-export const Route = createFileRoute("/_authenticated/topic/$topicId")({
+export const Route = createFileRoute("/_authenticated/topic/$topicId/")({
   component: TopicHub,
 });
 
