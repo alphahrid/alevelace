@@ -106,3 +106,13 @@
   body { background-color: var(--color-background); color: var(--color-foreground); }
   .katex { font-size: 1.05em; }
 }
+
+/* Print: mirror official past-paper layout — hide app chrome, keep the paper only. */
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  aside, nav, footer, [data-slot="sheet-content"], [data-slot="dialog-content"], .print\:hidden { display: none !important; }
+  main { min-width: 0 !important; }
+  a[href]::after { content: "" !important; }
+  .print-paper { max-width: 100% !important; padding: 0 !important; }
+  section, article, .rounded-xl { break-inside: avoid; box-shadow: none !important; }
+}

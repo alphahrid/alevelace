@@ -9,7 +9,18 @@ type Subject = { id: string; slug: string; name: string; color: string };
 type Attempt = { id: string; subject_id: string | null; score: number; total: number; started_at: string; finished_at: string | null };
 
 export const Route = createFileRoute("/_authenticated/mock/")({
-  head: () => ({ meta: [{ title: "Mock exams — A-Level Ace" }] }),
+  head: () => ({
+    meta: [
+      { title: "Mock exams — timed A-Level papers | A-Level Ace" },
+      { name: "description", content: "Build timed CIE or Edexcel mock papers by topic, paper type and question count, then get AI marking against real mark schemes." },
+      { property: "og:title", content: "Mock exams — timed A-Level papers | A-Level Ace" },
+      { property: "og:description", content: "Custom timed mock papers with M1/A1/B1 AI marking and printable PDF export." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://alevelace.lovable.app/mock" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://alevelace.lovable.app/mock" }],
+  }),
   component: MockIndex,
 });
 
@@ -53,6 +64,7 @@ function MockIndex() {
             <Button
               size="sm"
               className="w-full"
+              aria-label={`Start Mock Exam for ${s.name}`}
               onClick={() => navigate({ to: "/mock/$subjectId", params: { subjectId: s.id } })}
             >
               Start mock <ArrowRight className="size-4 ml-1" />
