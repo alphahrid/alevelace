@@ -33,7 +33,7 @@ export function AppShell() {
   return (
     <BoardProvider>
     <div className="min-h-screen flex bg-background text-foreground">
-      <aside className="hidden md:flex w-60 flex-col border-r bg-sidebar text-sidebar-foreground">
+      <aside className="hidden md:flex print:hidden w-60 flex-col border-r bg-sidebar text-sidebar-foreground">
         <div className="px-6 py-5 flex items-center gap-2 border-b border-sidebar-border">
           <div className="size-8 rounded-lg bg-primary text-primary-foreground grid place-items-center">
             <GraduationCap className="size-5" />
@@ -74,6 +74,7 @@ export function AppShell() {
             </div>
             Ask any question from any topic. Worked solutions for maths included.
           </Link>
+          <FormulaSheetTrigger className="w-full justify-center" />
           <div className="flex items-center gap-1">
             <DonationButton />
             <ThemeToggle />
@@ -89,7 +90,7 @@ export function AppShell() {
 
       <main className="flex-1 min-w-0">
         {/* Mobile top bar */}
-        <div className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b bg-background/80 backdrop-blur px-4 h-14">
+        <div className="md:hidden print:hidden sticky top-0 z-30 flex items-center justify-between border-b bg-background/80 backdrop-blur px-4 h-14">
           <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
             <div className="size-7 rounded-md bg-primary text-primary-foreground grid place-items-center">
               <GraduationCap className="size-4" />
@@ -98,6 +99,7 @@ export function AppShell() {
           </Link>
           <div className="flex items-center gap-1">
             <BoardToggle />
+            <FormulaSheetTrigger />
             <DonationButton />
             <ThemeToggle />
           </div>
@@ -105,7 +107,7 @@ export function AppShell() {
         <Outlet />
         <AppFooter />
         {/* Mobile bottom nav */}
-        <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur">
+        <nav aria-label="Primary" className="md:hidden print:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur">
           {mobileNav.map((n) => {
             const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
             return (
