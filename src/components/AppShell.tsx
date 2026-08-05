@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles, Timer, BookMarked, Trophy, Users } from "lucide-react";
+import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles, Timer, BookMarked, Trophy, Users, Layers } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -7,12 +7,14 @@ import { DonationButton } from "@/components/DonationModal";
 import { AppFooter } from "@/components/AppFooter";
 import { BoardProvider } from "@/lib/board";
 import { BoardToggle } from "@/components/BoardToggle";
+import { FormulaSheetTrigger } from "@/components/FormulaSheet";
 
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
   { to: "/subjects", label: "Subjects", icon: BookOpen },
   { to: "/notes", label: "Notes", icon: BookMarked },
+  { to: "/flashcards", label: "Flashcards", icon: Layers },
   { to: "/tutor", label: "AI Tutor", icon: Sparkles },
   { to: "/mock", label: "Mock exams", icon: Timer },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
@@ -20,7 +22,8 @@ const nav = [
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
-const mobileNav = nav.filter((n) => ["/dashboard", "/subjects", "/notes", "/tutor", "/leaderboard"].includes(n.to));
+const mobileNav = nav.filter((n) => ["/dashboard", "/subjects", "/notes", "/flashcards", "/tutor"].includes(n.to));
+
 
 
 export function AppShell() {
@@ -30,7 +33,7 @@ export function AppShell() {
   return (
     <BoardProvider>
     <div className="min-h-screen flex bg-background text-foreground">
-      <aside className="hidden md:flex w-60 flex-col border-r bg-sidebar text-sidebar-foreground">
+      <aside className="hidden md:flex print:hidden w-60 flex-col border-r bg-sidebar text-sidebar-foreground">
         <div className="px-6 py-5 flex items-center gap-2 border-b border-sidebar-border">
           <div className="size-8 rounded-lg bg-primary text-primary-foreground grid place-items-center">
             <GraduationCap className="size-5" />
@@ -71,6 +74,7 @@ export function AppShell() {
             </div>
             Ask any question from any topic. Worked solutions for maths included.
           </Link>
+          <FormulaSheetTrigger className="w-full justify-center" />
           <div className="flex items-center gap-1">
             <DonationButton />
             <ThemeToggle />
@@ -86,7 +90,7 @@ export function AppShell() {
 
       <main className="flex-1 min-w-0">
         {/* Mobile top bar */}
-        <div className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b bg-background/80 backdrop-blur px-4 h-14">
+        <div className="md:hidden print:hidden sticky top-0 z-30 flex items-center justify-between border-b bg-background/80 backdrop-blur px-4 h-14">
           <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
             <div className="size-7 rounded-md bg-primary text-primary-foreground grid place-items-center">
               <GraduationCap className="size-4" />
@@ -95,6 +99,7 @@ export function AppShell() {
           </Link>
           <div className="flex items-center gap-1">
             <BoardToggle />
+            <FormulaSheetTrigger />
             <DonationButton />
             <ThemeToggle />
           </div>
@@ -102,7 +107,7 @@ export function AppShell() {
         <Outlet />
         <AppFooter />
         {/* Mobile bottom nav */}
-        <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur">
+        <nav aria-label="Primary" className="md:hidden print:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur">
           {mobileNav.map((n) => {
             const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
             return (

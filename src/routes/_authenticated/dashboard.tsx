@@ -72,7 +72,7 @@ function Dashboard() {
       if (!u.user) return;
       uid = u.user.id;
       channel = supabase
-        .channel(`dashboard:${uid}`)
+        .channel(`dashboard:${uid}:${Math.random().toString(36).slice(2)}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "flashcards", filter: `user_id=eq.${uid}` }, () => load())
         .on("postgres_changes", { event: "*", schema: "public", table: "quiz_attempts", filter: `user_id=eq.${uid}` }, () => load())
         .on("postgres_changes", { event: "*", schema: "public", table: "study_sessions", filter: `user_id=eq.${uid}` }, () => load())

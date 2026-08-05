@@ -4,6 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Markdown } from "@/components/Markdown";
 import { Timer, ArrowLeft, Sparkles, Printer, Upload, PartyPopper } from "lucide-react";
@@ -27,6 +30,16 @@ const SECONDS_PER_Q = 90;
 const COUNT_OPTIONS = [5, 10, 15, 20];
 
 export const Route = createFileRoute("/_authenticated/mock/$subjectId")({
+  head: () => ({
+    meta: [
+      { title: "Mock exam builder — A-Level Ace" },
+      { name: "description", content: "Build a timed CIE or Edexcel mock paper: pick topics, question count and paper type, then get AI mark-scheme marking and a printable PDF." },
+      { property: "og:title", content: "Mock exam builder — A-Level Ace" },
+      { property: "og:description", content: "Timed A-Level mock papers with AI marking and printable A4 export." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: MockExam,
 });
 
@@ -54,6 +67,8 @@ function MockExam() {
   const [pickedTopics, setPickedTopics] = useState<string[]>([]);
   const [count, setCount] = useState(10);
   const [paperType, setPaperType] = useState<PaperType>("theory");
+  const [topicQuery, setTopicQuery] = useState("");
+  const [includeMarkScheme, setIncludeMarkScheme] = useState(true);
 
   const { board } = useBoard();
   const gen = useServerFn(generateMockExam);
@@ -72,7 +87,12 @@ function MockExam() {
   }, [subjectId]);
 
   const allowedLevels = useMemo(() => levelsFor(levelFilter), [levelFilter]);
-  const visibleTopics = useMemo(() => topics.filter((t) => allowedLevels.includes(t.level)), [topics, allowedLevels]);
+  const visibleTopics = useMemo(() => {
+    const q = topicQuery.trim().toLowerCase();
+    return topics
+      .filter((t) => allowedLevels.includes(t.level))
+      .filter((t) => !q || t.name.toLowerCase().includes(q) || (t.syllabus_ref || "").toLowerCase().includes(q));
+  }, [topics, allowedLevels, topicQuery]);
 
   useEffect(() => {
     if (phase !== "exam") return;
@@ -239,7 +259,20 @@ function MockExam() {
               <Button size="sm" variant={!allTopics ? "default" : "outline"} onClick={() => setAllTopics(false)}>Pick topics</Button>
             </div>
             {!allTopics && (
-              <div className="max-h-64 overflow-y-auto rounded-lg border divide-y">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <Input
+                  value={topicQuery}
+                  onChange={(e) => setTopicQuery(e.target.value)}
+                  placeholder="Search syllabus topics…"
+                  aria-label="Search syllabus topics"
+                  className="h-9 flex-1 min-w-48"
+                />
+                <Button size="sm" variant="outline" onClick={() => setPickedTopics(visibleTopics.map((t) => t.id))} aria-label="Select all listed topics">Select all</Button>
+                <Button size="sm" variant="ghost" onClick={() => setPickedTopics([])} aria-label="Clear selected topics">Clear</Button>
+              </div>
+            )}
+            {!allTopics && (
+              <div role="group" aria-label="Syllabus topics" className="max-h-64 overflow-y-auto rounded-lg border divide-y">
                 {visibleTopics.length === 0 && <div className="p-3 text-sm text-muted-foreground">No topics at this level.</div>}
                 {visibleTopics.map((t) => {
                   const on = pickedTopics.includes(t.id);
@@ -247,6 +280,9 @@ function MockExam() {
                     <button
                       key={t.id}
                       type="button"
+                      role="checkbox"
+                      aria-checked={on}
+                      aria-label={`${on ? "Deselect" : "Select"} topic ${t.name}`}
                       onClick={() => setPickedTopics((p) => on ? p.filter((x) => x !== t.id) : [...p, t.id])}
                       className={cn("w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition", on ? "bg-primary/10" : "hover:bg-muted/60")}
                     >
@@ -288,7 +324,18 @@ function MockExam() {
             </div>
           </section>
 
-          <Button onClick={() => void start()} disabled={busy} size="lg" className="w-full">
+          <section className="rounded-xl border bg-card p-5">
+            <div className="text-sm font-semibold mb-3">5 · PDF export</div>
+            <div className="flex items-center justify-between gap-4">
+              <Label htmlFor="include-ms" className="text-sm font-normal">
+                Include Mark Scheme &amp; Grader Rubric in PDF export
+                <span className="block text-[11px] text-muted-foreground">Turn off to print a clean question paper only.</span>
+              </Label>
+              <Switch id="include-ms" checked={includeMarkScheme} onCheckedChange={setIncludeMarkScheme} aria-label="Include mark scheme and grader rubric in PDF export" />
+            </div>
+          </section>
+
+          <Button onClick={() => void start()} disabled={busy} size="lg" className="w-full" aria-label="Generate mock paper and start the timed exam">
             <Sparkles className="size-4 mr-2" />{busy ? "Building your paper…" : "Generate & start mock"}
           </Button>
         </div>
@@ -313,7 +360,11 @@ function MockExam() {
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => printPaper(true)}><Printer className="size-4 mr-2" />Download / Print PDF</Button>
+          <Button variant="outline" onClick={() => printPaper(includeMarkScheme)} aria-label="Download or print this marked paper as a PDF"><Printer className="size-4 mr-2" />Download / Print PDF</Button>
+          <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <Switch checked={includeMarkScheme} onCheckedChange={setIncludeMarkScheme} aria-label="Include mark scheme and grader rubric in PDF export" />
+            Include mark scheme in export
+          </label>
         </div>
 
         <div className="mt-8 space-y-4">
@@ -352,8 +403,8 @@ function MockExam() {
   const answeredCount = Object.values(answers).filter((v) => v && v.trim().length > 0).length;
 
   return (
-    <div className="p-4 sm:p-6 max-w-3xl mx-auto">
-      <div className="sticky top-14 md:top-0 z-20 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mb-4 bg-background/85 backdrop-blur border-b flex items-center justify-between gap-3">
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto print-paper">
+      <div className="print:hidden sticky top-14 md:top-0 z-20 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mb-4 bg-background/85 backdrop-blur border-b flex items-center justify-between gap-3">
         <div className="text-sm">
           <div className="font-semibold">{subjectName} · Mock</div>
           <div className="text-xs text-muted-foreground">{answeredCount} / {questions.length} answered</div>
@@ -362,7 +413,7 @@ function MockExam() {
           {mm}:{ss}
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => printPaper(true)} title="Print or save this paper as a PDF">
+          <Button size="sm" variant="outline" onClick={() => printPaper(includeMarkScheme)} aria-label="Print or save this paper as a PDF" title="Print or save this paper as a PDF">
             <Printer className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Print / Save as PDF</span>
           </Button>
           <Button size="sm" variant="outline" onClick={() => { if (confirm("Submit paper now?")) void submit(); }} disabled={phase !== "exam"}>Submit</Button>
@@ -373,8 +424,8 @@ function MockExam() {
       <Progress value={((idx + 1) / questions.length) * 100} className="mb-4" />
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <Button size="sm" variant="outline" onClick={() => printPaper(false)}><Printer className="size-4 mr-1.5" />Print paper</Button>
-        <Button size="sm" variant="outline" onClick={() => printPaper(true)}><Printer className="size-4 mr-1.5" />Print + mark scheme</Button>
+        <Button size="sm" variant="outline" onClick={() => printPaper(false)} aria-label="Print question paper without the mark scheme"><Printer className="size-4 mr-1.5" />Print paper</Button>
+        <Button size="sm" variant="outline" onClick={() => printPaper(true)} aria-label="Print question paper with the mark scheme"><Printer className="size-4 mr-1.5" />Print + mark scheme</Button>
         <label className="inline-flex">
           <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => void onUpload(e.target.files)} />
           <span className="inline-flex items-center h-8 px-3 rounded-md border text-sm cursor-pointer hover:bg-muted">
@@ -430,7 +481,7 @@ function MockExam() {
       </div>
 
       {phase === "marking" && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur grid place-items-center">
+        <div role="dialog" aria-modal="true" aria-label="Marking your paper" className="fixed inset-0 z-50 bg-background/80 backdrop-blur grid place-items-center print:hidden">
           <div className="rounded-xl border bg-card p-6 text-center">
             <Sparkles className="size-6 text-primary mx-auto mb-2 animate-pulse" />
             <div className="font-semibold">Marking your paper…</div>

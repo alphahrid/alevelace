@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 type Subject = { id: string; slug: string; name: string; color: string; description: string | null };
 
-export const Route = createFileRoute("/_authenticated/subjects")({
+export const Route = createFileRoute("/_authenticated/subjects/")({
   head: () => ({
     meta: [
       { title: "Your subjects — A-Level Ace" },

@@ -18,18 +18,19 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
-import { Route as AuthenticatedSubjectsRouteImport } from './routes/_authenticated/subjects'
 import { Route as AuthenticatedSocialRouteImport } from './routes/_authenticated/social'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
-import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedFlashcardsRouteImport } from './routes/_authenticated/flashcards'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCommandWordsRouteImport } from './routes/_authenticated/command-words'
-import { Route as AuthenticatedTopicTopicIdRouteImport } from './routes/_authenticated/topic/$topicId'
+import { Route as AuthenticatedSubjectsIndexRouteImport } from './routes/_authenticated/subjects/index'
+import { Route as AuthenticatedMockIndexRouteImport } from './routes/_authenticated/mock/index'
 import { Route as AuthenticatedSubjectsSlugRouteImport } from './routes/_authenticated/subjects/$slug'
 import { Route as AuthenticatedProfileUsernameRouteImport } from './routes/_authenticated/profile/$username'
 import { Route as AuthenticatedMockSubjectIdRouteImport } from './routes/_authenticated/mock/$subjectId'
+import { Route as AuthenticatedTopicTopicIdIndexRouteImport } from './routes/_authenticated/topic/$topicId/index'
 import { Route as AuthenticatedTopicTopicIdTutorRouteImport } from './routes/_authenticated/topic/$topicId/tutor'
 import { Route as AuthenticatedTopicTopicIdQuizRouteImport } from './routes/_authenticated/topic/$topicId/quiz'
 import { Route as AuthenticatedTopicTopicIdCardsRouteImport } from './routes/_authenticated/topic/$topicId/cards'
@@ -78,11 +79,6 @@ const AuthenticatedTutorRoute = AuthenticatedTutorRouteImport.update({
   path: '/tutor',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedSubjectsRoute = AuthenticatedSubjectsRouteImport.update({
-  id: '/subjects',
-  path: '/subjects',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedSocialRoute = AuthenticatedSocialRouteImport.update({
   id: '/social',
   path: '/social',
@@ -98,17 +94,17 @@ const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
   path: '/notes',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedMockRoute = AuthenticatedMockRouteImport.update({
-  id: '/mock',
-  path: '/mock',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedLeaderboardRoute =
   AuthenticatedLeaderboardRouteImport.update({
     id: '/leaderboard',
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedFlashcardsRoute = AuthenticatedFlashcardsRouteImport.update({
+  id: '/flashcards',
+  path: '/flashcards',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -120,17 +116,22 @@ const AuthenticatedCommandWordsRoute =
     path: '/command-words',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedTopicTopicIdRoute =
-  AuthenticatedTopicTopicIdRouteImport.update({
-    id: '/topic/$topicId',
-    path: '/topic/$topicId',
+const AuthenticatedSubjectsIndexRoute =
+  AuthenticatedSubjectsIndexRouteImport.update({
+    id: '/subjects/',
+    path: '/subjects/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedMockIndexRoute = AuthenticatedMockIndexRouteImport.update({
+  id: '/mock/',
+  path: '/mock/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSubjectsSlugRoute =
   AuthenticatedSubjectsSlugRouteImport.update({
-    id: '/$slug',
-    path: '/$slug',
-    getParentRoute: () => AuthenticatedSubjectsRoute,
+    id: '/subjects/$slug',
+    path: '/subjects/$slug',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedProfileUsernameRoute =
   AuthenticatedProfileUsernameRouteImport.update({
@@ -140,27 +141,33 @@ const AuthenticatedProfileUsernameRoute =
   } as any)
 const AuthenticatedMockSubjectIdRoute =
   AuthenticatedMockSubjectIdRouteImport.update({
-    id: '/$subjectId',
-    path: '/$subjectId',
-    getParentRoute: () => AuthenticatedMockRoute,
+    id: '/mock/$subjectId',
+    path: '/mock/$subjectId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTopicTopicIdIndexRoute =
+  AuthenticatedTopicTopicIdIndexRouteImport.update({
+    id: '/topic/$topicId/',
+    path: '/topic/$topicId/',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedTopicTopicIdTutorRoute =
   AuthenticatedTopicTopicIdTutorRouteImport.update({
-    id: '/tutor',
-    path: '/tutor',
-    getParentRoute: () => AuthenticatedTopicTopicIdRoute,
+    id: '/topic/$topicId/tutor',
+    path: '/topic/$topicId/tutor',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedTopicTopicIdQuizRoute =
   AuthenticatedTopicTopicIdQuizRouteImport.update({
-    id: '/quiz',
-    path: '/quiz',
-    getParentRoute: () => AuthenticatedTopicTopicIdRoute,
+    id: '/topic/$topicId/quiz',
+    path: '/topic/$topicId/quiz',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedTopicTopicIdCardsRoute =
   AuthenticatedTopicTopicIdCardsRouteImport.update({
-    id: '/cards',
-    path: '/cards',
-    getParentRoute: () => AuthenticatedTopicTopicIdRoute,
+    id: '/topic/$topicId/cards',
+    path: '/topic/$topicId/cards',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -172,21 +179,22 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/command-words': typeof AuthenticatedCommandWordsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/flashcards': typeof AuthenticatedFlashcardsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
-  '/mock': typeof AuthenticatedMockRouteWithChildren
   '/notes': typeof AuthenticatedNotesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/social': typeof AuthenticatedSocialRoute
-  '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
   '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
   '/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/profile/$username': typeof AuthenticatedProfileUsernameRoute
   '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
-  '/topic/$topicId': typeof AuthenticatedTopicTopicIdRouteWithChildren
+  '/mock/': typeof AuthenticatedMockIndexRoute
+  '/subjects/': typeof AuthenticatedSubjectsIndexRoute
   '/topic/$topicId/cards': typeof AuthenticatedTopicTopicIdCardsRoute
   '/topic/$topicId/quiz': typeof AuthenticatedTopicTopicIdQuizRoute
   '/topic/$topicId/tutor': typeof AuthenticatedTopicTopicIdTutorRoute
+  '/topic/$topicId/': typeof AuthenticatedTopicTopicIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -197,21 +205,22 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/command-words': typeof AuthenticatedCommandWordsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/flashcards': typeof AuthenticatedFlashcardsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
-  '/mock': typeof AuthenticatedMockRouteWithChildren
   '/notes': typeof AuthenticatedNotesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/social': typeof AuthenticatedSocialRoute
-  '/subjects': typeof AuthenticatedSubjectsRouteWithChildren
   '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
   '/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/profile/$username': typeof AuthenticatedProfileUsernameRoute
   '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
-  '/topic/$topicId': typeof AuthenticatedTopicTopicIdRouteWithChildren
+  '/mock': typeof AuthenticatedMockIndexRoute
+  '/subjects': typeof AuthenticatedSubjectsIndexRoute
   '/topic/$topicId/cards': typeof AuthenticatedTopicTopicIdCardsRoute
   '/topic/$topicId/quiz': typeof AuthenticatedTopicTopicIdQuizRoute
   '/topic/$topicId/tutor': typeof AuthenticatedTopicTopicIdTutorRoute
+  '/topic/$topicId': typeof AuthenticatedTopicTopicIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -224,21 +233,22 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/command-words': typeof AuthenticatedCommandWordsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/flashcards': typeof AuthenticatedFlashcardsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
-  '/_authenticated/mock': typeof AuthenticatedMockRouteWithChildren
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/social': typeof AuthenticatedSocialRoute
-  '/_authenticated/subjects': typeof AuthenticatedSubjectsRouteWithChildren
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
   '/_authenticated/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/_authenticated/profile/$username': typeof AuthenticatedProfileUsernameRoute
   '/_authenticated/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
-  '/_authenticated/topic/$topicId': typeof AuthenticatedTopicTopicIdRouteWithChildren
+  '/_authenticated/mock/': typeof AuthenticatedMockIndexRoute
+  '/_authenticated/subjects/': typeof AuthenticatedSubjectsIndexRoute
   '/_authenticated/topic/$topicId/cards': typeof AuthenticatedTopicTopicIdCardsRoute
   '/_authenticated/topic/$topicId/quiz': typeof AuthenticatedTopicTopicIdQuizRoute
   '/_authenticated/topic/$topicId/tutor': typeof AuthenticatedTopicTopicIdTutorRoute
+  '/_authenticated/topic/$topicId/': typeof AuthenticatedTopicTopicIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -251,21 +261,22 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/command-words'
     | '/dashboard'
+    | '/flashcards'
     | '/leaderboard'
-    | '/mock'
     | '/notes'
     | '/settings'
     | '/social'
-    | '/subjects'
     | '/tutor'
     | '/api/tutor'
     | '/mock/$subjectId'
     | '/profile/$username'
     | '/subjects/$slug'
-    | '/topic/$topicId'
+    | '/mock/'
+    | '/subjects/'
     | '/topic/$topicId/cards'
     | '/topic/$topicId/quiz'
     | '/topic/$topicId/tutor'
+    | '/topic/$topicId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -276,21 +287,22 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/command-words'
     | '/dashboard'
+    | '/flashcards'
     | '/leaderboard'
-    | '/mock'
     | '/notes'
     | '/settings'
     | '/social'
-    | '/subjects'
     | '/tutor'
     | '/api/tutor'
     | '/mock/$subjectId'
     | '/profile/$username'
     | '/subjects/$slug'
-    | '/topic/$topicId'
+    | '/mock'
+    | '/subjects'
     | '/topic/$topicId/cards'
     | '/topic/$topicId/quiz'
     | '/topic/$topicId/tutor'
+    | '/topic/$topicId'
   id:
     | '__root__'
     | '/'
@@ -302,21 +314,22 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/command-words'
     | '/_authenticated/dashboard'
+    | '/_authenticated/flashcards'
     | '/_authenticated/leaderboard'
-    | '/_authenticated/mock'
     | '/_authenticated/notes'
     | '/_authenticated/settings'
     | '/_authenticated/social'
-    | '/_authenticated/subjects'
     | '/_authenticated/tutor'
     | '/api/tutor'
     | '/_authenticated/mock/$subjectId'
     | '/_authenticated/profile/$username'
     | '/_authenticated/subjects/$slug'
-    | '/_authenticated/topic/$topicId'
+    | '/_authenticated/mock/'
+    | '/_authenticated/subjects/'
     | '/_authenticated/topic/$topicId/cards'
     | '/_authenticated/topic/$topicId/quiz'
     | '/_authenticated/topic/$topicId/tutor'
+    | '/_authenticated/topic/$topicId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -395,13 +408,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTutorRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/subjects': {
-      id: '/_authenticated/subjects'
-      path: '/subjects'
-      fullPath: '/subjects'
-      preLoaderRoute: typeof AuthenticatedSubjectsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/social': {
       id: '/_authenticated/social'
       path: '/social'
@@ -423,18 +429,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/mock': {
-      id: '/_authenticated/mock'
-      path: '/mock'
-      fullPath: '/mock'
-      preLoaderRoute: typeof AuthenticatedMockRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/leaderboard': {
       id: '/_authenticated/leaderboard'
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/flashcards': {
+      id: '/_authenticated/flashcards'
+      path: '/flashcards'
+      fullPath: '/flashcards'
+      preLoaderRoute: typeof AuthenticatedFlashcardsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
@@ -451,19 +457,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommandWordsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/topic/$topicId': {
-      id: '/_authenticated/topic/$topicId'
-      path: '/topic/$topicId'
-      fullPath: '/topic/$topicId'
-      preLoaderRoute: typeof AuthenticatedTopicTopicIdRouteImport
+    '/_authenticated/subjects/': {
+      id: '/_authenticated/subjects/'
+      path: '/subjects'
+      fullPath: '/subjects/'
+      preLoaderRoute: typeof AuthenticatedSubjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/mock/': {
+      id: '/_authenticated/mock/'
+      path: '/mock'
+      fullPath: '/mock/'
+      preLoaderRoute: typeof AuthenticatedMockIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/subjects/$slug': {
       id: '/_authenticated/subjects/$slug'
-      path: '/$slug'
+      path: '/subjects/$slug'
       fullPath: '/subjects/$slug'
       preLoaderRoute: typeof AuthenticatedSubjectsSlugRouteImport
-      parentRoute: typeof AuthenticatedSubjectsRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/profile/$username': {
       id: '/_authenticated/profile/$username'
@@ -474,103 +487,80 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/mock/$subjectId': {
       id: '/_authenticated/mock/$subjectId'
-      path: '/$subjectId'
+      path: '/mock/$subjectId'
       fullPath: '/mock/$subjectId'
       preLoaderRoute: typeof AuthenticatedMockSubjectIdRouteImport
-      parentRoute: typeof AuthenticatedMockRoute
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/topic/$topicId/': {
+      id: '/_authenticated/topic/$topicId/'
+      path: '/topic/$topicId'
+      fullPath: '/topic/$topicId/'
+      preLoaderRoute: typeof AuthenticatedTopicTopicIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/topic/$topicId/tutor': {
       id: '/_authenticated/topic/$topicId/tutor'
-      path: '/tutor'
+      path: '/topic/$topicId/tutor'
       fullPath: '/topic/$topicId/tutor'
       preLoaderRoute: typeof AuthenticatedTopicTopicIdTutorRouteImport
-      parentRoute: typeof AuthenticatedTopicTopicIdRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/topic/$topicId/quiz': {
       id: '/_authenticated/topic/$topicId/quiz'
-      path: '/quiz'
+      path: '/topic/$topicId/quiz'
       fullPath: '/topic/$topicId/quiz'
       preLoaderRoute: typeof AuthenticatedTopicTopicIdQuizRouteImport
-      parentRoute: typeof AuthenticatedTopicTopicIdRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/topic/$topicId/cards': {
       id: '/_authenticated/topic/$topicId/cards'
-      path: '/cards'
+      path: '/topic/$topicId/cards'
       fullPath: '/topic/$topicId/cards'
       preLoaderRoute: typeof AuthenticatedTopicTopicIdCardsRouteImport
-      parentRoute: typeof AuthenticatedTopicTopicIdRoute
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
-
-interface AuthenticatedMockRouteChildren {
-  AuthenticatedMockSubjectIdRoute: typeof AuthenticatedMockSubjectIdRoute
-}
-
-const AuthenticatedMockRouteChildren: AuthenticatedMockRouteChildren = {
-  AuthenticatedMockSubjectIdRoute: AuthenticatedMockSubjectIdRoute,
-}
-
-const AuthenticatedMockRouteWithChildren =
-  AuthenticatedMockRoute._addFileChildren(AuthenticatedMockRouteChildren)
-
-interface AuthenticatedSubjectsRouteChildren {
-  AuthenticatedSubjectsSlugRoute: typeof AuthenticatedSubjectsSlugRoute
-}
-
-const AuthenticatedSubjectsRouteChildren: AuthenticatedSubjectsRouteChildren = {
-  AuthenticatedSubjectsSlugRoute: AuthenticatedSubjectsSlugRoute,
-}
-
-const AuthenticatedSubjectsRouteWithChildren =
-  AuthenticatedSubjectsRoute._addFileChildren(
-    AuthenticatedSubjectsRouteChildren,
-  )
-
-interface AuthenticatedTopicTopicIdRouteChildren {
-  AuthenticatedTopicTopicIdCardsRoute: typeof AuthenticatedTopicTopicIdCardsRoute
-  AuthenticatedTopicTopicIdQuizRoute: typeof AuthenticatedTopicTopicIdQuizRoute
-  AuthenticatedTopicTopicIdTutorRoute: typeof AuthenticatedTopicTopicIdTutorRoute
-}
-
-const AuthenticatedTopicTopicIdRouteChildren: AuthenticatedTopicTopicIdRouteChildren =
-  {
-    AuthenticatedTopicTopicIdCardsRoute: AuthenticatedTopicTopicIdCardsRoute,
-    AuthenticatedTopicTopicIdQuizRoute: AuthenticatedTopicTopicIdQuizRoute,
-    AuthenticatedTopicTopicIdTutorRoute: AuthenticatedTopicTopicIdTutorRoute,
-  }
-
-const AuthenticatedTopicTopicIdRouteWithChildren =
-  AuthenticatedTopicTopicIdRoute._addFileChildren(
-    AuthenticatedTopicTopicIdRouteChildren,
-  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedCommandWordsRoute: typeof AuthenticatedCommandWordsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFlashcardsRoute: typeof AuthenticatedFlashcardsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
-  AuthenticatedMockRoute: typeof AuthenticatedMockRouteWithChildren
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSocialRoute: typeof AuthenticatedSocialRoute
-  AuthenticatedSubjectsRoute: typeof AuthenticatedSubjectsRouteWithChildren
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
+  AuthenticatedMockSubjectIdRoute: typeof AuthenticatedMockSubjectIdRoute
   AuthenticatedProfileUsernameRoute: typeof AuthenticatedProfileUsernameRoute
-  AuthenticatedTopicTopicIdRoute: typeof AuthenticatedTopicTopicIdRouteWithChildren
+  AuthenticatedSubjectsSlugRoute: typeof AuthenticatedSubjectsSlugRoute
+  AuthenticatedMockIndexRoute: typeof AuthenticatedMockIndexRoute
+  AuthenticatedSubjectsIndexRoute: typeof AuthenticatedSubjectsIndexRoute
+  AuthenticatedTopicTopicIdCardsRoute: typeof AuthenticatedTopicTopicIdCardsRoute
+  AuthenticatedTopicTopicIdQuizRoute: typeof AuthenticatedTopicTopicIdQuizRoute
+  AuthenticatedTopicTopicIdTutorRoute: typeof AuthenticatedTopicTopicIdTutorRoute
+  AuthenticatedTopicTopicIdIndexRoute: typeof AuthenticatedTopicTopicIdIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCommandWordsRoute: AuthenticatedCommandWordsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFlashcardsRoute: AuthenticatedFlashcardsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
-  AuthenticatedMockRoute: AuthenticatedMockRouteWithChildren,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSocialRoute: AuthenticatedSocialRoute,
-  AuthenticatedSubjectsRoute: AuthenticatedSubjectsRouteWithChildren,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
+  AuthenticatedMockSubjectIdRoute: AuthenticatedMockSubjectIdRoute,
   AuthenticatedProfileUsernameRoute: AuthenticatedProfileUsernameRoute,
-  AuthenticatedTopicTopicIdRoute: AuthenticatedTopicTopicIdRouteWithChildren,
+  AuthenticatedSubjectsSlugRoute: AuthenticatedSubjectsSlugRoute,
+  AuthenticatedMockIndexRoute: AuthenticatedMockIndexRoute,
+  AuthenticatedSubjectsIndexRoute: AuthenticatedSubjectsIndexRoute,
+  AuthenticatedTopicTopicIdCardsRoute: AuthenticatedTopicTopicIdCardsRoute,
+  AuthenticatedTopicTopicIdQuizRoute: AuthenticatedTopicTopicIdQuizRoute,
+  AuthenticatedTopicTopicIdTutorRoute: AuthenticatedTopicTopicIdTutorRoute,
+  AuthenticatedTopicTopicIdIndexRoute: AuthenticatedTopicTopicIdIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -590,13 +580,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
