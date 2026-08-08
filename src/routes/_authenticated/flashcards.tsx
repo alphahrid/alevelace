@@ -51,19 +51,29 @@ function FlashcardsPage() {
   const [importTopic, setImportTopic] = useState("");
   const [importing, setImporting] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [nextDue, setNextDue] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const importDoc = useServerFn(flashcardsFromDocument);
 
   const load = useCallback(async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const [{ data: due }, { count }, { data: prof }] = await Promise.all([
+    const [{ data: due }, { count }, { data: prof }, { data: upcoming }] = await Promise.all([
       supabase.from("flashcards").select("*").eq("user_id", u.user.id).lte("due_at", new Date().toISOString()).order("due_at").limit(60),
       supabase.from("flashcards").select("id", { count: "exact", head: true }).eq("user_id", u.user.id),
       supabase.from("profiles").select("selected_subjects").eq("id", u.user.id).single(),
+      supabase
+        .from("flashcards")
+        .select("due_at")
+        .eq("user_id", u.user.id)
+        .gt("due_at", new Date().toISOString())
+        .order("due_at")
+        .limit(1),
     ]);
     setQueue((due as Card[]) || []);
     setTotalCards(count || 0);
+    setNextDue((upcoming as Array<{ due_at: string }> | null)?.[0]?.due_at ?? null);
     const ids = (prof?.selected_subjects as string[] | null) || [];
     if (ids.length) {
       const [{ data: subs }, { data: tps }] = await Promise.all([
