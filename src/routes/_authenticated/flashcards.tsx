@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/Markdown";
 import { ReadAloud } from "@/components/ReadAloud";
-import { Layers, UploadCloud, RotateCcw, Sparkles } from "lucide-react";
+import { Layers, UploadCloud, RotateCcw, Sparkles, Download, CloudCheck } from "lucide-react";
 import { toast } from "sonner";
 import { scheduleNext, type Rating } from "@/lib/srs";
 import { flashcardsFromDocument } from "@/lib/flashcards.functions";
+import { buildAnkiTsv, buildAnkiCsv, exportFilename, downloadExport, type ExportCard } from "@/lib/anki-export";
 import { cn } from "@/lib/utils";
 
 type Card = {

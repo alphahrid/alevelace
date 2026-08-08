@@ -20,6 +20,7 @@ import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedSocialRouteImport } from './routes/_authenticated/social'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedFlashcardsRouteImport } from './routes/_authenticated/flashcards'
@@ -87,6 +88,11 @@ const AuthenticatedSocialRoute = AuthenticatedSocialRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/flashcards': typeof AuthenticatedFlashcardsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/notes': typeof AuthenticatedNotesRoute
+  '/plan': typeof AuthenticatedPlanRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/social': typeof AuthenticatedSocialRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/flashcards': typeof AuthenticatedFlashcardsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/notes': typeof AuthenticatedNotesRoute
+  '/plan': typeof AuthenticatedPlanRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/social': typeof AuthenticatedSocialRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/_authenticated/flashcards': typeof AuthenticatedFlashcardsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
+  '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/social': typeof AuthenticatedSocialRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/flashcards'
     | '/leaderboard'
     | '/notes'
+    | '/plan'
     | '/settings'
     | '/social'
     | '/tutor'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/flashcards'
     | '/leaderboard'
     | '/notes'
+    | '/plan'
     | '/settings'
     | '/social'
     | '/tutor'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/_authenticated/flashcards'
     | '/_authenticated/leaderboard'
     | '/_authenticated/notes'
+    | '/_authenticated/plan'
     | '/_authenticated/settings'
     | '/_authenticated/social'
     | '/_authenticated/tutor'
@@ -420,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/plan': {
+      id: '/_authenticated/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof AuthenticatedPlanRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/notes': {
@@ -529,6 +548,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedFlashcardsRoute: typeof AuthenticatedFlashcardsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
+  AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSocialRoute: typeof AuthenticatedSocialRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
@@ -549,6 +569,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFlashcardsRoute: AuthenticatedFlashcardsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
+  AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSocialRoute: AuthenticatedSocialRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
@@ -580,13 +601,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
