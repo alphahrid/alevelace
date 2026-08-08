@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/Markdown";
 import { ReadAloud } from "@/components/ReadAloud";
-import { Layers, UploadCloud, RotateCcw, Sparkles } from "lucide-react";
+import { Layers, UploadCloud, RotateCcw, Sparkles, Download, CloudCheck } from "lucide-react";
 import { toast } from "sonner";
 import { scheduleNext, type Rating } from "@/lib/srs";
 import { flashcardsFromDocument } from "@/lib/flashcards.functions";
+import { buildAnkiTsv, buildAnkiCsv, exportFilename, downloadExport, type ExportCard } from "@/lib/anki-export";
 import { cn } from "@/lib/utils";
 
 type Card = {
@@ -50,19 +51,29 @@ function FlashcardsPage() {
   const [importTopic, setImportTopic] = useState("");
   const [importing, setImporting] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [nextDue, setNextDue] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const importDoc = useServerFn(flashcardsFromDocument);
 
   const load = useCallback(async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const [{ data: due }, { count }, { data: prof }] = await Promise.all([
+    const [{ data: due }, { count }, { data: prof }, { data: upcoming }] = await Promise.all([
       supabase.from("flashcards").select("*").eq("user_id", u.user.id).lte("due_at", new Date().toISOString()).order("due_at").limit(60),
       supabase.from("flashcards").select("id", { count: "exact", head: true }).eq("user_id", u.user.id),
       supabase.from("profiles").select("selected_subjects").eq("id", u.user.id).single(),
+      supabase
+        .from("flashcards")
+        .select("due_at")
+        .eq("user_id", u.user.id)
+        .gt("due_at", new Date().toISOString())
+        .order("due_at")
+        .limit(1),
     ]);
     setQueue((due as Card[]) || []);
     setTotalCards(count || 0);
+    setNextDue((upcoming as Array<{ due_at: string }> | null)?.[0]?.due_at ?? null);
     const ids = (prof?.selected_subjects as string[] | null) || [];
     if (ids.length) {
       const [{ data: subs }, { data: tps }] = await Promise.all([
@@ -129,6 +140,43 @@ function FlashcardsPage() {
     }
   };
 
+  const exportDecks = async (format: "tsv" | "csv") => {
+    setExporting(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const { data, error } = await supabase
+        .from("flashcards")
+        .select("front, back, topic_id, ease, interval_days, reps, due_at")
+        .eq("user_id", u.user.id)
+        .order("topic_id")
+        .limit(2000);
+      if (error) throw new Error(error.message);
+      const rows = (data as Array<Omit<ExportCard, "deck" | "tags"> & { topic_id: string }> | null) ?? [];
+      if (rows.length === 0) return toast.error("You have no flashcards to export yet.");
+
+      const topicById = new Map(topics.map((t) => [t.id, t]));
+      const subjectById = new Map(subjects.map((s) => [s.id, s]));
+      const cards: ExportCard[] = rows.map((r) => {
+        const t = topicById.get(r.topic_id);
+        const s = t ? subjectById.get(t.subject_id) : undefined;
+        return {
+          ...r,
+          deck: t ? (s ? `${s.name}::${t.name}` : t.name) : null,
+          tags: [s?.name, t?.name].filter(Boolean) as string[],
+        };
+      });
+
+      const contents = format === "tsv" ? buildAnkiTsv(cards) : buildAnkiCsv(cards);
+      downloadExport(contents, exportFilename(format));
+      toast.success(`${cards.length} cards exported${format === "tsv" ? " — import the .txt straight into Anki" : " as CSV"}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="p-6 sm:p-8 max-w-3xl mx-auto">
       <header className="mb-6">
@@ -138,7 +186,23 @@ function FlashcardsPage() {
         <p className="text-muted-foreground mt-1">
           SM-2 spaced repetition across every deck. {totalCards} cards total · {queue.length} due now.
         </p>
+        <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+          <CloudCheck className="size-3.5 text-success" />
+          Progress and next-review dates are saved to your account, so your schedule follows you on every device.
+          {nextDue && <span> Next card due {new Date(nextDue).toLocaleString()}.</span>}
+        </p>
+        {totalCards > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2 print:hidden">
+            <Button variant="outline" size="sm" disabled={exporting} aria-label="Export deck for Anki" onClick={() => void exportDecks("tsv")}>
+              <Download className="size-4 mr-1.5" /> Export for Anki
+            </Button>
+            <Button variant="ghost" size="sm" disabled={exporting} aria-label="Export deck as CSV" onClick={() => void exportDecks("csv")}>
+              Export CSV
+            </Button>
+          </div>
+        )}
       </header>
+
 
       {current ? (
         <section aria-live="polite">
