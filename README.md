@@ -5,13 +5,13 @@ An interactive EdTech web application engineered to streamline study workflows, 
 ---
 
 ## 🚀 Impact & Live Demo
-* **Active Users:** Serving **50+ active Cambridge A-Level candidates**[cite: 6].
+* **Active Users:** Serving **50+ active Cambridge A-Level candidates**
 * **Live Application:** [https://alevelace.lovable.app]
 
 ---
 
 ## ✨ Key Features
-* **Syllabus Progress Tracker:** Interactive checklists directly mapped to CIE syllabus codes (Math 9709, Further Math 9231, Physics 9702, Chemistry 9701, Business and Computer Science)[cite: 6].
+* **Syllabus Progress Tracker:** Interactive checklists directly mapped to CIE syllabus codes (Math 9709, Further Math 9231, Physics 9702, Chemistry 9701, Business and Computer Science)
 * **Study Workflows:** Integrated flashcard engine, leaderboards, and revision notes management system.
 * **Responsive UI:** Optimized for desktop and mobile study sessions.
 
@@ -28,7 +28,7 @@ TypeScript,PLpgSQL and others
 
 ## 👨‍💻 Founder & Lead Developer
 **Tasfia Tahmid Hridita**  
-*A-Level Candidate | STEM & Technology Enthusiast*[cite: 6]
+*A-Level Candidate | STEM & Technology Enthusiast*
 
 ```sh
 git clone <github.com/alphahrld/alevelace>
