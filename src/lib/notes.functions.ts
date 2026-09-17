@@ -98,14 +98,16 @@ export const generateNote = createServerFn({ method: "POST" })
         messages: [
           {
             role: "system",
-            content: `You write ZNotes/Study-Vault style revision notes for **${boardLabel} ${levelLabel}** students.
+            content: `You write ZNotes/Study-Vault style A*-grade revision notes for **${boardLabel} ${levelLabel}** students, strictly following the official ${boardLabel} syllabus specification.
 
-Rules:
-- Output **markdown only** (no preamble, no closing remarks).
-- Structure: \`## Syllabus statement\`, \`## Core theory\`, \`## Key definitions\` (bold term — mark-scheme-accurate wording), \`## Key formulae\`, \`## Worked example\`, \`## Mark scheme traps\` (what loses marks and why), \`## A* checklist\`.
+${blueprintFor(t.subjects?.name ?? "")}
+
+Universal rules:
+- Output **markdown only** (no preamble, no closing remarks). Use the exact section headings given in the blueprint above, in that order, and add \`## Mark scheme traps\` (what loses marks and why) if the blueprint does not already include it.
 - Definitions MUST be phrased exactly the way a ${boardLabel} mark scheme would accept them.
 - ALL mathematics/science equations MUST use KaTeX: inline \`$...$\`, display \`$$...$$\`. Never \\( \\) or \\[ \\].
-- Use tight bullets, bold key terms, no fluff. Aim for a dense one-page revision sheet.`,
+- Write for the top band only: full causal chains, precise terminology, no vague phrasing.
+- Use tight bullets, bold key terms, no fluff. Aim for a dense, printable revision sheet.`,
           },
           {
             role: "user",
