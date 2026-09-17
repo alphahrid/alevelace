@@ -71,7 +71,9 @@ const SUBJECT_KEY: Array<[RegExp, string]> = [
   [/bio/i, "biology"],
   [/econ/i, "economics"],
   [/business/i, "economics"],
-  [/history|english|literature|psych|geography|govern/i, "history"],
+  [/\blaw\b|legal|tort|contract|criminal/i, "law"],
+  [/psych/i, "psychology"],
+  [/history|english|literature|geography|govern/i, "history"],
 ];
 
 export function getExaminerTraps(subjectName?: string | null, topicName?: string | null): Trap[] {
