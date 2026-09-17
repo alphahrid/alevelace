@@ -53,6 +53,22 @@ const BY_KEYWORD: Record<string, Trap[]> = {
     { mistake: "No real-world example or data in 'Evaluate' essays.", avoid: "Every top-band essay cites one concrete example (country, year, policy). Memorise 3–4 case studies per topic." },
     { mistake: "Ignoring the specific policy the question asks about.", avoid: "If the question says 'fiscal policy', don't drift into monetary. Re-read the question after each paragraph." },
   ],
+  // LAW
+  law: [
+    { mistake: "Stating a legal rule without citing its authority.", avoid: "Every rule needs a case or statute section beside it — 'duty of care (Donoghue v Stevenson 1932)', 'theft (Theft Act 1968 s.1(1))'." },
+    { mistake: "Describing the law instead of applying it to the facts given.", avoid: "Use IRAC: Issue → Rule (with authority) → Application to *these* facts → Conclusion. Application marks only come from the facts in the scenario." },
+    { mistake: "Missing an element of a legal test.", avoid: "Work through tests element by element — negligence: duty, breach, causation, remoteness, damage. A skipped element is a lost mark, even if your conclusion is right." },
+    { mistake: "One-sided evaluation in 20/30-mark essays.", avoid: "Balance criticism with counter-argument and reform proposals (Law Commission), then give a reasoned conclusion — top bands require judgement, not a list." },
+    { mistake: "Muddling criminal and civil standards/parties.", avoid: "Criminal: prosecution, beyond reasonable doubt, defendant convicted. Civil: claimant, balance of probabilities, defendant liable. Never mix the vocabulary." },
+  ],
+  // PSYCHOLOGY
+  psychology: [
+    { mistake: "Naming a study without its researcher, year, or key detail.", avoid: "Learn researcher + year + aim + sample + one quantitative result per core study. Vague 'a study showed...' scores nothing." },
+    { mistake: "Evaluating with labels only ('low validity').", avoid: "Use GRAVE as full arguments: state the point, give the evidence from the study, then explain the consequence for the conclusion." },
+    { mistake: "Not operationalising variables in research-methods questions.", avoid: "Write the IV and DV as measurable statements ('DV: number of words recalled from a 20-word list in 60 s'), not as concepts." },
+    { mistake: "Ethics answers limited to 'it was unethical'.", avoid: "Name the specific guideline breached — informed consent, deception, protection from harm, right to withdraw, confidentiality — and how it could be fixed." },
+    { mistake: "Ignoring the command word in application questions.", avoid: "'Suggest' needs a plausible new example, 'Explain' needs psychological theory linked with because/so that, 'Describe' needs no evaluation at all." },
+  ],
   // HISTORY / ENGLISH
   history: [
     { mistake: "Narrative instead of argument — telling the story rather than answering the question.", avoid: "Every paragraph should start with a claim that answers 'to what extent...' or 'why...', then use events as evidence." },
