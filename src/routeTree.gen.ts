@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PastPapersRouteImport } from './routes/past-papers'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AboutRouteImport } from './routes/about'
@@ -44,6 +45,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PastPapersRoute = PastPapersRouteImport.update({
+  id: '/past-papers',
+  path: '/past-papers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/past-papers': typeof PastPapersRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/command-words': typeof AuthenticatedCommandWordsRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/past-papers': typeof PastPapersRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/command-words': typeof AuthenticatedCommandWordsRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/past-papers': typeof PastPapersRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/command-words': typeof AuthenticatedCommandWordsRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/onboarding'
+    | '/past-papers'
     | '/signup'
     | '/sitemap.xml'
     | '/command-words'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/onboarding'
+    | '/past-papers'
     | '/signup'
     | '/sitemap.xml'
     | '/command-words'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/onboarding'
+    | '/past-papers'
     | '/signup'
     | '/sitemap.xml'
     | '/_authenticated/command-words'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  PastPapersRoute: typeof PastPapersRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiTutorRoute: typeof ApiTutorRoute
@@ -369,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/past-papers': {
+      id: '/past-papers'
+      path: '/past-papers'
+      fullPath: '/past-papers'
+      preLoaderRoute: typeof PastPapersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -594,6 +614,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  PastPapersRoute: PastPapersRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiTutorRoute: ApiTutorRoute,
