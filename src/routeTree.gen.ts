@@ -17,6 +17,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedSocialRouteImport } from './routes/_authenticated/social'
@@ -27,6 +29,7 @@ import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenti
 import { Route as AuthenticatedFlashcardsRouteImport } from './routes/_authenticated/flashcards'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCommandWordsRouteImport } from './routes/_authenticated/command-words'
+import { Route as AuthenticatedBlogAdminRouteImport } from './routes/_authenticated/blog-admin'
 import { Route as AuthenticatedSubjectsIndexRouteImport } from './routes/_authenticated/subjects/index'
 import { Route as AuthenticatedMockIndexRouteImport } from './routes/_authenticated/mock/index'
 import { Route as AuthenticatedSubjectsSlugRouteImport } from './routes/_authenticated/subjects/$slug'
@@ -74,6 +77,16 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTutorRoute = ApiTutorRouteImport.update({
@@ -128,6 +141,11 @@ const AuthenticatedCommandWordsRoute =
     path: '/command-words',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedBlogAdminRoute = AuthenticatedBlogAdminRouteImport.update({
+  id: '/blog-admin',
+  path: '/blog-admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSubjectsIndexRoute =
   AuthenticatedSubjectsIndexRouteImport.update({
     id: '/subjects/',
@@ -190,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/past-papers': typeof PastPapersRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/blog-admin': typeof AuthenticatedBlogAdminRoute
   '/command-words': typeof AuthenticatedCommandWordsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/flashcards': typeof AuthenticatedFlashcardsRoute
@@ -200,6 +219,8 @@ export interface FileRoutesByFullPath {
   '/social': typeof AuthenticatedSocialRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/profile/$username': typeof AuthenticatedProfileUsernameRoute
   '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
@@ -218,6 +239,7 @@ export interface FileRoutesByTo {
   '/past-papers': typeof PastPapersRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/blog-admin': typeof AuthenticatedBlogAdminRoute
   '/command-words': typeof AuthenticatedCommandWordsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/flashcards': typeof AuthenticatedFlashcardsRoute
@@ -228,6 +250,8 @@ export interface FileRoutesByTo {
   '/social': typeof AuthenticatedSocialRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog': typeof BlogIndexRoute
   '/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/profile/$username': typeof AuthenticatedProfileUsernameRoute
   '/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
@@ -248,6 +272,7 @@ export interface FileRoutesById {
   '/past-papers': typeof PastPapersRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/blog-admin': typeof AuthenticatedBlogAdminRoute
   '/_authenticated/command-words': typeof AuthenticatedCommandWordsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/flashcards': typeof AuthenticatedFlashcardsRoute
@@ -258,6 +283,8 @@ export interface FileRoutesById {
   '/_authenticated/social': typeof AuthenticatedSocialRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/_authenticated/mock/$subjectId': typeof AuthenticatedMockSubjectIdRoute
   '/_authenticated/profile/$username': typeof AuthenticatedProfileUsernameRoute
   '/_authenticated/subjects/$slug': typeof AuthenticatedSubjectsSlugRoute
@@ -278,6 +305,7 @@ export interface FileRouteTypes {
     | '/past-papers'
     | '/signup'
     | '/sitemap.xml'
+    | '/blog-admin'
     | '/command-words'
     | '/dashboard'
     | '/flashcards'
@@ -288,6 +316,8 @@ export interface FileRouteTypes {
     | '/social'
     | '/tutor'
     | '/api/tutor'
+    | '/blog/$slug'
+    | '/blog/'
     | '/mock/$subjectId'
     | '/profile/$username'
     | '/subjects/$slug'
@@ -306,6 +336,7 @@ export interface FileRouteTypes {
     | '/past-papers'
     | '/signup'
     | '/sitemap.xml'
+    | '/blog-admin'
     | '/command-words'
     | '/dashboard'
     | '/flashcards'
@@ -316,6 +347,8 @@ export interface FileRouteTypes {
     | '/social'
     | '/tutor'
     | '/api/tutor'
+    | '/blog/$slug'
+    | '/blog'
     | '/mock/$subjectId'
     | '/profile/$username'
     | '/subjects/$slug'
@@ -335,6 +368,7 @@ export interface FileRouteTypes {
     | '/past-papers'
     | '/signup'
     | '/sitemap.xml'
+    | '/_authenticated/blog-admin'
     | '/_authenticated/command-words'
     | '/_authenticated/dashboard'
     | '/_authenticated/flashcards'
@@ -345,6 +379,8 @@ export interface FileRouteTypes {
     | '/_authenticated/social'
     | '/_authenticated/tutor'
     | '/api/tutor'
+    | '/blog/$slug'
+    | '/blog/'
     | '/_authenticated/mock/$subjectId'
     | '/_authenticated/profile/$username'
     | '/_authenticated/subjects/$slug'
@@ -366,6 +402,8 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiTutorRoute: typeof ApiTutorRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -424,6 +462,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/tutor': {
@@ -496,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommandWordsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/blog-admin': {
+      id: '/_authenticated/blog-admin'
+      path: '/blog-admin'
+      fullPath: '/blog-admin'
+      preLoaderRoute: typeof AuthenticatedBlogAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/subjects/': {
       id: '/_authenticated/subjects/'
       path: '/subjects'
@@ -563,6 +622,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedBlogAdminRoute: typeof AuthenticatedBlogAdminRoute
   AuthenticatedCommandWordsRoute: typeof AuthenticatedCommandWordsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFlashcardsRoute: typeof AuthenticatedFlashcardsRoute
@@ -584,6 +644,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBlogAdminRoute: AuthenticatedBlogAdminRoute,
   AuthenticatedCommandWordsRoute: AuthenticatedCommandWordsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFlashcardsRoute: AuthenticatedFlashcardsRoute,
@@ -618,6 +679,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiTutorRoute: ApiTutorRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
