@@ -68,6 +68,51 @@ export type Database = {
           },
         ]
       }
+      blog_posts: {
+        Row: {
+          author_name: string
+          content: string
+          created_at: string
+          excerpt: string
+          id: string
+          published: boolean
+          published_at: string
+          read_minutes: number
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_name?: string
+          content: string
+          created_at?: string
+          excerpt: string
+          id?: string
+          published?: boolean
+          published_at?: string
+          read_minutes?: number
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          published?: boolean
+          published_at?: string
+          read_minutes?: number
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       flashcard_templates: {
         Row: {
           back: string
@@ -672,6 +717,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -700,6 +766,13 @@ export type Database = {
           label: string
           username: string
         }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       leaderboard: {
         Args: { _friends?: boolean; _metric?: string }
@@ -750,6 +823,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       exam_board: "cambridge" | "edexcel" | "both"
       question_type: "mcq" | "short"
       syllabus_level: "as" | "a2"
@@ -880,6 +954,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       exam_board: ["cambridge", "edexcel", "both"],
       question_type: ["mcq", "short"],
       syllabus_level: ["as", "a2"],
