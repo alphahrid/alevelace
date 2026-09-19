@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronRight, BookMarked, ListChecks, Timer } from "lucide-react";
+import { ChevronRight, BookMarked, ListChecks, Timer, FileText } from "lucide-react";
 import { ExaminerTrapDoor } from "@/components/ExaminerTrapDoor";
 import { ReadAloud } from "@/components/ReadAloud";
 import { LevelTabs } from "@/components/LevelTabs";
