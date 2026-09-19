@@ -76,6 +76,10 @@ function NotesHub() {
     if (chosen.length) {
       const { data: subs } = await supabase.from("subjects").select("id, slug, name, color").in("id", chosen).order("name");
       finalSubs = (subs as Subject[]) || [];
+      if (subjectSlug) {
+        const focused = finalSubs.filter((s) => s.slug === subjectSlug);
+        if (focused.length) finalSubs = focused;
+      }
     }
     setSubjects(finalSubs);
     if (finalSubs.length) {
@@ -94,7 +98,7 @@ function NotesHub() {
     setNotes((ns as Note[]) || []);
   };
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void load(); }, [subjectSlug]);
 
   const allowed = useMemo(() => levelsFor(filter), [filter]);
   const visibleTopics = useMemo(() => topics.filter((t) => allowed.includes(t.level)), [topics, allowed]);
