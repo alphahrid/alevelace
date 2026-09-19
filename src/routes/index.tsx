@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Sparkles, Brain, Layers, ClipboardCheck, MessageSquareText } from "lucide-react";
+import { SiteHeader } from "@/components/SiteHeader";
+import { AppFooter } from "@/components/AppFooter";
+import { Sparkles, Brain, Layers, ClipboardCheck, MessageSquareText, CalendarCheck, Timer, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
