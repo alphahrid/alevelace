@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Timer, ArrowRight } from "lucide-react";
+import { Timer, ArrowRight, FileText } from "lucide-react";
 import { filterSelectedSubjects } from "@/lib/subject-filter";
 
 type Subject = { id: string; slug: string; name: string; color: string };
