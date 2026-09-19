@@ -40,10 +40,11 @@ export const Route = createFileRoute("/_authenticated/notes")({
 });
 
 function NotesHub() {
+  const { subject: subjectSlug, level: levelParam } = Route.useSearch();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [filter, setFilter] = useState<LevelFilter>("full");
+  const [filter, setFilter] = useState<LevelFilter>(levelParam ?? "full");
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [active, setActive] = useState<Note | null>(null);
   const [busyTopic, setBusyTopic] = useState<string | null>(null);
