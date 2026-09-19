@@ -18,13 +18,12 @@ type Topic = { id: string; name: string; subject_id: string; level: SyllabusLeve
 type Note = { id: string; title: string; content: string; level: SyllabusLevel; topic_id: string | null; subject_id: string | null; updated_at: string };
 
 export const Route = createFileRoute("/_authenticated/notes")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    subject: typeof search.subject === "string" ? search.subject : undefined,
-    level:
-      search.level === "as" || search.level === "a2" || search.level === "full"
-        ? (search.level as LevelFilter)
-        : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { subject?: string; level?: LevelFilter } => {
+    const out: { subject?: string; level?: LevelFilter } = {};
+    if (typeof search.subject === "string") out.subject = search.subject;
+    if (search.level === "as" || search.level === "a2" || search.level === "full") out.level = search.level;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "Study Vaults — AI A-Level Notes | A-Level Ace" },
