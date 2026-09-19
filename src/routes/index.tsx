@@ -62,21 +62,8 @@ function Landing() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-primary text-primary-foreground grid place-items-center">
-              <GraduationCap className="size-5" />
-            </div>
-            <span className="font-semibold tracking-tight">A-Level Ace</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link to="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
-            <Link to="/signup"><Button size="sm">Get started</Button></Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex flex-col">
+      <SiteHeader />
 
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
         <div className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground mb-6">
@@ -86,15 +73,19 @@ function Landing() {
           Master any A-Level subject — theory and maths.
         </h1>
         <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-          An AI tutor that explains anything, spaced-repetition flashcards that stick, and exam-style quizzes that mark your work. Built for Cambridge and Edexcel.
+          An AI tutor that explains anything, spaced-repetition flashcards that stick, timed mock exams marked to real
+          mark schemes, and every official CIE and Edexcel past paper one click away.
         </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link to="/signup"><Button size="lg">Start learning free</Button></Link>
-          <Link to="/login"><Button size="lg" variant="outline">I have an account</Button></Link>
+          <Link to="/past-papers"><Button size="lg" variant="outline">Browse past papers</Button></Link>
         </div>
+        <p className="mt-4 text-sm text-muted-foreground">
+          10 subjects · AS &amp; A2 · <Link to="/blog" className="underline underline-offset-2 hover:text-foreground">read the study guides</Link>
+        </p>
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 pb-24 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="max-w-6xl mx-auto px-6 pb-16 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: MessageSquareText, title: "AI tutor chat", body: "Ask anything, get step-by-step worked solutions with proper maths notation." },
           { icon: Layers, title: "Spaced repetition", body: "Auto-generated flashcards reviewed at the perfect interval." },
@@ -110,6 +101,37 @@ function Landing() {
           </div>
         ))}
       </section>
+
+      <section className="max-w-6xl mx-auto px-6 pb-24 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <HomeLink to="/plan" icon={CalendarCheck} title="Personalised study plan" body="A 7-day plan built from your marks, mocks and flashcard health." />
+        <HomeLink to="/mock" icon={Timer} title="Timed mock exams" body="Build a paper by topic and question count, then get M1/A1/B1 marking." />
+        <HomeLink to="/flashcards" icon={Layers} title="Flashcards" body="Spaced repetition that syncs across devices, exportable to Anki." />
+        <HomeLink to="/past-papers" icon={FileText} title="Past papers" body="Official CIE and Edexcel papers, mark schemes and grade thresholds." />
+      </section>
+
+      <div className="mt-auto">
+        <AppFooter />
+      </div>
     </div>
+  );
+}
+
+function HomeLink({
+  to,
+  icon: Icon,
+  title,
+  body,
+}: {
+  to: "/plan" | "/mock" | "/flashcards" | "/past-papers";
+  icon: typeof Sparkles;
+  title: string;
+  body: string;
+}) {
+  return (
+    <Link to={to} className="rounded-xl border bg-card p-5 hover:border-primary/40 transition">
+      <Icon className="size-5 text-primary mb-2" />
+      <div className="font-semibold text-sm">{title}</div>
+      <p className="text-xs text-muted-foreground mt-1">{body}</p>
+    </Link>
   );
 }
