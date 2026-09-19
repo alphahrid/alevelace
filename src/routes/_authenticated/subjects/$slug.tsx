@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronRight, BookMarked, ListChecks, Timer } from "lucide-react";
+import { ChevronRight, BookMarked, ListChecks, Timer, FileText } from "lucide-react";
 import { ExaminerTrapDoor } from "@/components/ExaminerTrapDoor";
 import { ReadAloud } from "@/components/ReadAloud";
 import { LevelTabs } from "@/components/LevelTabs";
@@ -45,22 +45,42 @@ function SubjectPage() {
       </div>
       <p className="text-muted-foreground mb-6">{subject.description}</p>
 
-      <section className="grid sm:grid-cols-3 gap-3 mb-8">
-        <Link to="/notes" className="rounded-xl border bg-card p-4 hover:border-primary/40 transition">
-          <div className="flex items-center gap-2 font-medium text-sm"><BookMarked className="size-4 text-primary" /> Generate / view AI notes</div>
-          <p className="text-xs text-muted-foreground mt-1">AS &amp; A2 chapter chunks in mark-scheme wording.</p>
-        </Link>
+      <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+        <div className="rounded-xl border bg-card p-4">
+          <div className="flex items-center gap-2 font-medium text-sm"><BookMarked className="size-4 text-primary" /> Generate / View A* Notes</div>
+          <p className="text-xs text-muted-foreground mt-1 mb-3">Mark-scheme wording, split by syllabus level.</p>
+          <div className="flex gap-2">
+            <Link
+              to="/notes"
+              search={{ subject: subject.slug, level: "as" }}
+              className="flex-1 text-center text-xs font-medium rounded-md border px-2 py-1.5 hover:border-primary/50 transition"
+            >
+              AS Level
+            </Link>
+            <Link
+              to="/notes"
+              search={{ subject: subject.slug, level: "a2" }}
+              className="flex-1 text-center text-xs font-medium rounded-md border px-2 py-1.5 hover:border-primary/50 transition"
+            >
+              A2 Level
+            </Link>
+          </div>
+        </div>
         {firstTopic ? (
           <Link to="/topic/$topicId/quiz" params={{ topicId: firstTopic.id }} className="rounded-xl border bg-card p-4 hover:border-primary/40 transition">
-            <div className="flex items-center gap-2 font-medium text-sm"><ListChecks className="size-4 text-primary" /> Take topic quiz</div>
+            <div className="flex items-center gap-2 font-medium text-sm"><ListChecks className="size-4 text-primary" /> Take Topic Quiz</div>
             <p className="text-xs text-muted-foreground mt-1">Starts with {firstTopic.name}.</p>
           </Link>
         ) : (
           <div className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">No topics for this level yet.</div>
         )}
         <Link to="/mock/$subjectId" params={{ subjectId: subject.id }} className="rounded-xl border bg-card p-4 hover:border-primary/40 transition">
-          <div className="flex items-center gap-2 font-medium text-sm"><Timer className="size-4 text-primary" /> Start subject mock exam</div>
+          <div className="flex items-center gap-2 font-medium text-sm"><Timer className="size-4 text-primary" /> Start Subject Mock Exam</div>
           <p className="text-xs text-muted-foreground mt-1">Timed, board-tailored, AI-marked.</p>
+        </Link>
+        <Link to="/past-papers" className="rounded-xl border bg-card p-4 hover:border-primary/40 transition">
+          <div className="flex items-center gap-2 font-medium text-sm"><FileText className="size-4 text-primary" /> Official past papers</div>
+          <p className="text-xs text-muted-foreground mt-1">CIE &amp; Edexcel papers, mark schemes, thresholds.</p>
         </Link>
       </section>
 

@@ -18,6 +18,12 @@ type Topic = { id: string; name: string; subject_id: string; level: SyllabusLeve
 type Note = { id: string; title: string; content: string; level: SyllabusLevel; topic_id: string | null; subject_id: string | null; updated_at: string };
 
 export const Route = createFileRoute("/_authenticated/notes")({
+  validateSearch: (search: Record<string, unknown>): { subject?: string; level?: LevelFilter } => {
+    const out: { subject?: string; level?: LevelFilter } = {};
+    if (typeof search.subject === "string") out.subject = search.subject;
+    if (search.level === "as" || search.level === "a2" || search.level === "full") out.level = search.level;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "Study Vaults — AI A-Level Notes | A-Level Ace" },
@@ -34,10 +40,11 @@ export const Route = createFileRoute("/_authenticated/notes")({
 });
 
 function NotesHub() {
+  const { subject: subjectSlug, level: levelParam } = Route.useSearch();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [filter, setFilter] = useState<LevelFilter>("full");
+  const [filter, setFilter] = useState<LevelFilter>(levelParam ?? "full");
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [active, setActive] = useState<Note | null>(null);
   const [busyTopic, setBusyTopic] = useState<string | null>(null);
@@ -69,6 +76,10 @@ function NotesHub() {
     if (chosen.length) {
       const { data: subs } = await supabase.from("subjects").select("id, slug, name, color").in("id", chosen).order("name");
       finalSubs = (subs as Subject[]) || [];
+      if (subjectSlug) {
+        const focused = finalSubs.filter((s) => s.slug === subjectSlug);
+        if (focused.length) finalSubs = focused;
+      }
     }
     setSubjects(finalSubs);
     if (finalSubs.length) {
@@ -87,7 +98,7 @@ function NotesHub() {
     setNotes((ns as Note[]) || []);
   };
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void load(); }, [subjectSlug]);
 
   const allowed = useMemo(() => levelsFor(filter), [filter]);
   const visibleTopics = useMemo(() => topics.filter((t) => allowed.includes(t.level)), [topics, allowed]);

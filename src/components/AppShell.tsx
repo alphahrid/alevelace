@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles, Timer, BookMarked, Trophy, Users, Layers, CalendarCheck } from "lucide-react";
+import { BookOpen, Home, GraduationCap, Settings, LogOut, Sparkles, Timer, BookMarked, Trophy, Users, Layers, CalendarCheck, FileText } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -18,6 +18,7 @@ const nav = [
   { to: "/flashcards", label: "Flashcards", icon: Layers },
   { to: "/tutor", label: "AI Tutor", icon: Sparkles },
   { to: "/mock", label: "Mock exams", icon: Timer },
+  { to: "/past-papers", label: "Past papers", icon: FileText },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/social", label: "Study circle", icon: Users },
   { to: "/settings", label: "Settings", icon: Settings },

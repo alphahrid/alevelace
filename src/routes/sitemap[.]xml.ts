@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
 
 const BASE_URL = "https://alevelace.lovable.app";
 
@@ -15,10 +16,26 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
+          { path: "/past-papers", changefreq: "monthly", priority: "0.9" },
+          { path: "/blog", changefreq: "weekly", priority: "0.8" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/signup", changefreq: "monthly", priority: "0.6" },
           { path: "/login", changefreq: "monthly", priority: "0.4" },
         ];
+
+        try {
+          const { data } = await supabase
+            .from("blog_posts")
+            .select("slug")
+            .eq("published", true);
+          for (const post of data ?? []) {
+            entries.push({ path: `/blog/${post.slug}`, changefreq: "monthly", priority: "0.7" });
+          }
+        } catch {
+          // sitemap still serves the static entries if the blog query fails
+        }
+
+
 
         const urls = entries.map((e) =>
           [
