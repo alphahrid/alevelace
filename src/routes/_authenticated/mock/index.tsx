@@ -48,6 +48,9 @@ function MockIndex() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2"><Timer className="size-7 text-primary" /> Mock exams</h1>
         <p className="text-muted-foreground mt-1">Full timed papers, AI-marked with a feedback breakdown.</p>
+        <Link to="/past-papers" className="mt-3 inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
+          <FileText className="size-4" /> Official CIE &amp; Edexcel past papers, mark schemes and grade thresholds
+        </Link>
       </header>
 
       <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
