@@ -72,6 +72,16 @@ function BlogIndex() {
               params={{ slug: p.slug }}
               className="block rounded-xl border bg-card p-6 hover:border-primary/40 transition"
             >
+              {p.og_image && (
+                <img
+                  src={p.og_image}
+                  alt=""
+                  width={1200}
+                  height={630}
+                  loading="lazy"
+                  className="mb-4 w-full rounded-lg object-cover aspect-[1200/630]"
+                />
+              )}
               <h2 className="text-xl font-semibold tracking-tight">{p.title}</h2>
               <p className="text-sm text-muted-foreground mt-2">{p.excerpt}</p>
               <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
