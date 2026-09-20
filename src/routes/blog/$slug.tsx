@@ -14,13 +14,16 @@ type Post = {
   read_minutes: number;
   published_at: string;
   author_name: string;
+  og_image: string | null;
 };
+
+const DEFAULT_OG_IMAGE = "https://alevelace.lovable.app/og/blog-default.jpg";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("blog_posts")
-      .select("slug, title, excerpt, content, tags, read_minutes, published_at, author_name")
+      .select("slug, title, excerpt, content, tags, read_minutes, published_at, author_name, og_image")
       .eq("slug", params.slug)
       .eq("published", true)
       .maybeSingle();
@@ -33,6 +36,7 @@ export const Route = createFileRoute("/blog/$slug")({
     }
     const { post } = loaderData;
     const url = `https://alevelace.lovable.app/blog/${post.slug}`;
+    const image = post.og_image || DEFAULT_OG_IMAGE;
     return {
       meta: [
         { title: `${post.title} | A-Level Ace` },
@@ -41,8 +45,10 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "og:description", content: post.excerpt },
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
+        { property: "og:image", content: image },
         { property: "article:author", content: post.author_name },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: image },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -53,6 +59,7 @@ export const Route = createFileRoute("/blog/$slug")({
             "@type": "BlogPosting",
             headline: post.title,
             description: post.excerpt,
+            image,
             datePublished: post.published_at,
             author: { "@type": "Person", name: post.author_name },
             publisher: { "@type": "Organization", name: "A-Level Ace", url: "https://alevelace.lovable.app" },
@@ -84,6 +91,13 @@ function BlogPost() {
             <span key={t} className="rounded bg-muted px-1.5 py-0.5">{t}</span>
           ))}
         </div>
+        <img
+          src={post.og_image || DEFAULT_OG_IMAGE}
+          alt={post.title}
+          width={1200}
+          height={630}
+          className="mt-6 w-full rounded-xl border object-cover"
+        />
         <div className="mt-8">
           <Markdown>{post.content}</Markdown>
         </div>

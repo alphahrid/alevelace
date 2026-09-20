@@ -75,6 +75,7 @@ export type Database = {
           created_at: string
           excerpt: string
           id: string
+          og_image: string | null
           published: boolean
           published_at: string
           read_minutes: number
@@ -89,6 +90,7 @@ export type Database = {
           created_at?: string
           excerpt: string
           id?: string
+          og_image?: string | null
           published?: boolean
           published_at?: string
           read_minutes?: number
@@ -103,6 +105,7 @@ export type Database = {
           created_at?: string
           excerpt?: string
           id?: string
+          og_image?: string | null
           published?: boolean
           published_at?: string
           read_minutes?: number

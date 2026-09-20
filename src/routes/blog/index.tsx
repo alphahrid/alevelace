@@ -12,6 +12,7 @@ type Post = {
   read_minutes: number;
   published_at: string;
   author_name: string;
+  og_image: string | null;
 };
 
 const TITLE = "A-Level Ace blog — study tips, exam technique & revision guides";
@@ -27,14 +28,16 @@ export const Route = createFileRoute("/blog/")({
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://alevelace.lovable.app/blog" },
-      { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { property: "og:image", content: "https://alevelace.lovable.app/og/blog-default.jpg" },
+        { name: "twitter:image", content: "https://alevelace.lovable.app/og/blog-default.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://alevelace.lovable.app/blog" }],
   }),
   loader: async () => {
     const { data } = await supabase
       .from("blog_posts")
-      .select("slug, title, excerpt, tags, read_minutes, published_at, author_name")
+      .select("slug, title, excerpt, tags, read_minutes, published_at, author_name, og_image")
       .eq("published", true)
       .order("published_at", { ascending: false });
     return { posts: (data as Post[]) || [] };
@@ -69,6 +72,16 @@ function BlogIndex() {
               params={{ slug: p.slug }}
               className="block rounded-xl border bg-card p-6 hover:border-primary/40 transition"
             >
+              {p.og_image && (
+                <img
+                  src={p.og_image}
+                  alt=""
+                  width={1200}
+                  height={630}
+                  loading="lazy"
+                  className="mb-4 w-full rounded-lg object-cover aspect-[1200/630]"
+                />
+              )}
               <h2 className="text-xl font-semibold tracking-tight">{p.title}</h2>
               <p className="text-sm text-muted-foreground mt-2">{p.excerpt}</p>
               <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
