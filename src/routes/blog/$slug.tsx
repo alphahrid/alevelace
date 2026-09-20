@@ -14,13 +14,16 @@ type Post = {
   read_minutes: number;
   published_at: string;
   author_name: string;
+  og_image: string | null;
 };
+
+const DEFAULT_OG_IMAGE = "https://alevelace.lovable.app/og/blog-default.jpg";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("blog_posts")
-      .select("slug, title, excerpt, content, tags, read_minutes, published_at, author_name")
+      .select("slug, title, excerpt, content, tags, read_minutes, published_at, author_name, og_image")
       .eq("slug", params.slug)
       .eq("published", true)
       .maybeSingle();
