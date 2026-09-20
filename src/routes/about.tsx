@@ -12,9 +12,11 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "A-Level Ace is an AI revision platform for Cambridge and Edexcel A-Level students, founded by Tasfia Tahmid Hridita." },
       { property: "og:title", content: "About A-Level Ace" },
       { property: "og:description", content: "AI tutoring, spaced repetition, mock exams and study vaults for AS and A2 students." },
-      { property: "og:url", content: "/about" },
+      { property: "og:url", content: "https://alevelace.lovable.app/about" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "https://alevelace.lovable.app/og/home.jpg" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://alevelace.lovable.app/og/home.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://alevelace.lovable.app/about" }],
   }),
@@ -24,11 +26,10 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <SiteHeader />
       <main className="flex-1 max-w-3xl mx-auto px-6 py-16">
         <div className="flex items-center gap-3 mb-6">
-          <div className="size-10 rounded-lg bg-primary text-primary-foreground grid place-items-center">
-            <GraduationCap className="size-5" />
-          </div>
+          <Logo className="size-11" />
           <h1 className="text-3xl font-bold tracking-tight">About A-Level Ace</h1>
         </div>
 
