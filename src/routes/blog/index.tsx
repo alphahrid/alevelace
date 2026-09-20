@@ -12,6 +12,7 @@ type Post = {
   read_minutes: number;
   published_at: string;
   author_name: string;
+  og_image: string | null;
 };
 
 const TITLE = "A-Level Ace blog — study tips, exam technique & revision guides";
@@ -27,7 +28,9 @@ export const Route = createFileRoute("/blog/")({
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://alevelace.lovable.app/blog" },
-      { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { property: "og:image", content: "https://alevelace.lovable.app/og/blog-default.jpg" },
+        { name: "twitter:image", content: "https://alevelace.lovable.app/og/blog-default.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://alevelace.lovable.app/blog" }],
   }),
