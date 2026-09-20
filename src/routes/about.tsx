@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppFooter } from "@/components/AppFooter";
-import { GraduationCap, Sparkles, Timer, BookMarked } from "lucide-react";
+import { SiteHeader } from "@/components/SiteHeader";
+import { Logo } from "@/components/Logo";
+import { Sparkles, Timer, BookMarked } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/about")({

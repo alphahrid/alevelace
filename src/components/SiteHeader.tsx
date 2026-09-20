@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 
 /** Public marketing header used on the homepage, blog and past papers pages. */
 export function SiteHeader() {
@@ -8,9 +8,7 @@ export function SiteHeader() {
     <header className="border-b">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2">
-          <div className="size-8 rounded-lg bg-primary text-primary-foreground grid place-items-center">
-            <GraduationCap className="size-5" />
-          </div>
+          <Logo className="size-8" />
           <span className="font-semibold tracking-tight">A-Level Ace</span>
         </Link>
         <nav className="hidden sm:flex items-center gap-5 text-sm text-muted-foreground">
