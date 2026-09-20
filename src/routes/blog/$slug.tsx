@@ -36,6 +36,7 @@ export const Route = createFileRoute("/blog/$slug")({
     }
     const { post } = loaderData;
     const url = `https://alevelace.lovable.app/blog/${post.slug}`;
+    const image = post.og_image || DEFAULT_OG_IMAGE;
     return {
       meta: [
         { title: `${post.title} | A-Level Ace` },
@@ -44,8 +45,10 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "og:description", content: post.excerpt },
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
+        { property: "og:image", content: image },
         { property: "article:author", content: post.author_name },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: image },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -56,6 +59,7 @@ export const Route = createFileRoute("/blog/$slug")({
             "@type": "BlogPosting",
             headline: post.title,
             description: post.excerpt,
+            image,
             datePublished: post.published_at,
             author: { "@type": "Person", name: post.author_name },
             publisher: { "@type": "Organization", name: "A-Level Ace", url: "https://alevelace.lovable.app" },
