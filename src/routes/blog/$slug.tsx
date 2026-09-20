@@ -91,6 +91,13 @@ function BlogPost() {
             <span key={t} className="rounded bg-muted px-1.5 py-0.5">{t}</span>
           ))}
         </div>
+        <img
+          src={post.og_image || DEFAULT_OG_IMAGE}
+          alt={post.title}
+          width={1200}
+          height={630}
+          className="mt-6 w-full rounded-xl border object-cover"
+        />
         <div className="mt-8">
           <Markdown>{post.content}</Markdown>
         </div>
