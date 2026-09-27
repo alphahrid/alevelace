@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AppFooter } from "@/components/AppFooter";
 import { Sparkles, Brain, Layers, ClipboardCheck, MessageSquareText, CalendarCheck, Timer, FileText } from "lucide-react";
+import logoMark from "@/assets/logo-mark.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -13,9 +14,11 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "AI tutor, smart flashcards, exam-style quizzes and mock papers for Cambridge and Edexcel A-Levels." },
       { property: "og:title", content: "A-Level Ace" },
       { property: "og:description", content: "Master A-Levels with AI tutoring, flashcards and quizzes." },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: "https://alevelace.lovable.app/" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "https://alevelace.lovable.app/og/home.jpg" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://alevelace.lovable.app/og/home.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://alevelace.lovable.app/" }],
     scripts: [
@@ -68,6 +71,13 @@ function Landing() {
       <SiteHeader />
 
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
+        <img
+          src={logoMark}
+          alt="A-Level Ace logo"
+          width={1024}
+          height={1024}
+          className="size-20 mx-auto mb-6 object-contain"
+        />
         <div className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground mb-6">
           <Sparkles className="size-3" /> Cambridge · Edexcel · powered by AI
         </div>
