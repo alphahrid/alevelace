@@ -81,6 +81,7 @@ export const Route = createFileRoute("/api/tutor")({
           .from("tutor_messages")
           .select("role, content")
           .eq("conversation_id", body.conversationId)
+          .in("role", ["user", "assistant"])
           .order("created_at", { ascending: true })
           .limit(40);
 
@@ -95,7 +96,9 @@ export const Route = createFileRoute("/api/tutor")({
         const systemPrompt = buildSystemPrompt(boardLabel, body.topicContext, body.paperFocus);
         const messages = [
           { role: "system", content: systemPrompt },
-          ...(history || []).map((m) => ({ role: m.role, content: m.content })),
+          ...(history || [])
+            .filter((m) => m.role === "user" || m.role === "assistant")
+            .map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
           { role: "user", content: body.userMessage },
         ];
 
