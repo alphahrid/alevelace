@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794735976259,
+      "tag": "0000_tighten_social_roles_and_profile_writes",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794736150148,
+      "tag": "0001_bound_user_supplied_rank_inputs",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794736208369,
+      "tag": "0002_cap_leaderboard_activity_contributions",
+      "breakpoints": true
+    }
+  ]
+}
