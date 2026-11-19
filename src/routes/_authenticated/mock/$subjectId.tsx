@@ -13,7 +13,7 @@ import { Timer, ArrowLeft, Sparkles, Printer, Upload, PartyPopper } from "lucide
 import { toast } from "sonner";
 import { generateMockExam, markUploadedPaper } from "@/lib/mock.functions";
 import { PAPER_TYPES, type PaperType } from "@/lib/mock.helpers";
-import { gradeShortAnswer } from "@/lib/ai.functions";
+import { gradeAnswer, finalizeAttempt } from "@/lib/grading.functions";
 import { useBoard, BOARD_LABEL } from "@/lib/board";
 import { LevelTabs } from "@/components/LevelTabs";
 import { exportExamPdf } from "@/lib/print-exam";
@@ -72,7 +72,8 @@ function MockExam() {
 
   const { board } = useBoard();
   const gen = useServerFn(generateMockExam);
-  const grade = useServerFn(gradeShortAnswer);
+  const grade = useServerFn(gradeAnswer);
+  const finalize = useServerFn(finalizeAttempt);
   const markUpload = useServerFn(markUploadedPaper);
 
   useEffect(() => {
@@ -124,48 +125,32 @@ function MockExam() {
     } finally { setBusy(false); }
   };
 
-  const persist = async (out: Result[], score: number, duration: number) => {
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user || !attemptId) return;
-    await supabase.from("quiz_attempts").update({
-      score, total: questions.length, duration_seconds: duration, finished_at: new Date().toISOString(),
-    }).eq("id", attemptId);
-    const answerRows = out.map((r) => {
-      const q = questions.find((x) => x.id === r.questionId)!;
-      return {
-        attempt_id: attemptId, user_id: u.user!.id, question_id: q.id,
-        question_prompt: q.prompt, user_answer: r.userAnswer,
-        correct: r.correct, score: r.score, ai_feedback: r.feedback || null,
-      };
-    });
-    await supabase.from("attempt_answers").insert(answerRows);
-    await supabase.from("study_sessions").insert({ user_id: u.user.id, subject_id: subjectId, activity: "mock", minutes: Math.max(5, Math.round(duration / 60)) });
+  const persist = async (gradeIds: string[]) => {
+    if (!attemptId) return;
+    try {
+      await finalize({ data: { gradeIds, attemptId, subjectId, total: questions.length } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save your result");
+    }
   };
 
   const submit = async () => {
     if (phase === "marking" || phase === "done") return;
     setPhase("marking");
-    const duration = Math.round((Date.now() - startedAt.current) / 1000);
     const out: Result[] = [];
-    let score = 0;
+    const gradeIds: string[] = [];
     for (const q of questions) {
       const userAnswer = answers[q.id] || "";
-      if (q.type === "mcq") {
-        const correct = userAnswer.trim() === q.answer.trim();
-        if (correct) score++;
-        out.push({ questionId: q.id, correct, score: correct ? 1 : 0, userAnswer });
-      } else {
-        try {
-          const r = await grade({ data: { prompt: q.prompt, modelAnswer: q.answer, userAnswer } });
-          if (r.correct) score++;
-          out.push({ questionId: q.id, correct: r.correct, score: r.score, userAnswer, feedback: r.feedback });
-        } catch {
-          out.push({ questionId: q.id, correct: false, score: 0, userAnswer, feedback: "Marking unavailable" });
-        }
+      try {
+        const r = await grade({ data: { questionId: q.id, userAnswer } });
+        gradeIds.push(r.gradeId);
+        out.push({ questionId: q.id, correct: r.correct, score: r.score, userAnswer, feedback: r.feedback ?? undefined });
+      } catch {
+        out.push({ questionId: q.id, correct: false, score: 0, userAnswer, feedback: "Marking unavailable" });
       }
     }
     setResults(out);
-    await persist(out, score, duration);
+    await persist(gradeIds);
     setPhase("done");
   };
 
@@ -185,7 +170,7 @@ function MockExam() {
       const r = await markUpload({
         data: {
           images,
-          markScheme: questions.map((q, i) => ({ index: i + 1, prompt: q.prompt, answer: q.answer })),
+          questionIds: questions.map((q) => q.id),
         },
       });
       const out: Result[] = questions.map((q, i) => {
@@ -198,9 +183,8 @@ function MockExam() {
           feedback: m?.feedback || "Not found in the uploaded pages.",
         };
       });
-      const score = out.filter((o) => o.correct).length;
       setResults(out);
-      await persist(out, score, Math.round((Date.now() - startedAt.current) / 1000));
+      await persist(r.gradeIds);
       if (r.overall) toast.success(r.overall.slice(0, 160));
       setPhase("done");
     } catch (e) {

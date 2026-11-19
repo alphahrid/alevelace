@@ -22,6 +22,13 @@
       "when": 1794736208369,
       "tag": "0002_cap_leaderboard_activity_contributions",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795106824890,
+      "tag": "0003_server_verified_leaderboard_activity",
+      "breakpoints": true
     }
   ]
 }

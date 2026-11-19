@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Markdown } from "@/components/Markdown";
 import { ArrowLeft, Sparkles, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { generateQuiz, gradeShortAnswer } from "@/lib/ai.functions";
+import { generateQuiz } from "@/lib/ai.functions";
+import { gradeAnswer, finalizeAttempt } from "@/lib/grading.functions";
 
 type Q = { id: string; type: "mcq" | "short"; prompt: string; choices: string[] | null; answer: string; explanation: string };
 
@@ -26,7 +27,9 @@ function Quiz() {
   const [generating, setGenerating] = useState(false);
   const [grading, setGrading] = useState(false);
   const gen = useServerFn(generateQuiz);
-  const grade = useServerFn(gradeShortAnswer);
+  const grade = useServerFn(gradeAnswer);
+  const finalize = useServerFn(finalizeAttempt);
+  const [gradeIds, setGradeIds] = useState<string[]>([]);
 
   const load = async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -90,36 +93,25 @@ function Quiz() {
 
   const submit = async () => {
     if (!q) return;
-    if (q.type === "mcq") {
-      const correct = answer === q.answer;
-      setRevealed({ correct, score: correct ? 1 : 0 });
-      if (correct) setScore((s) => s + 1);
-    } else {
-      setGrading(true);
-      try {
-        const r = await grade({ data: { prompt: q.prompt, modelAnswer: q.answer, userAnswer: answer } });
-        setRevealed({ correct: r.correct, score: r.score, feedback: r.feedback });
-        if (r.correct) setScore((s) => s + 1);
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Grading failed");
-      } finally { setGrading(false); }
-    }
+    setGrading(true);
+    try {
+      const r = await grade({ data: { questionId: q.id, userAnswer: answer } });
+      setGradeIds((g) => [...g, r.gradeId]);
+      setRevealed({ correct: r.correct, score: r.score, feedback: r.feedback ?? undefined });
+      if (r.correct) setScore((s) => s + 1);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Grading failed");
+    } finally { setGrading(false); }
   };
 
   const next = async () => {
     if (idx + 1 >= questions.length) {
-      const { data: u } = await supabase.auth.getUser();
-      if (u.user) {
-        await supabase.from("quiz_attempts").insert({
-          user_id: u.user.id,
-          topic_id: topicId,
-          mode: "quiz",
-          score,
-          total: questions.length,
-          finished_at: new Date().toISOString(),
-        });
-        await supabase.from("study_sessions").insert({ user_id: u.user.id, topic_id: topicId, activity: "quiz", minutes: Math.max(2, questions.length) });
+      try {
+        await finalize({ data: { gradeIds, topicId, total: questions.length } });
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Could not save your result");
       }
+      setGradeIds([]);
       toast.success(`Quiz complete: ${score} / ${questions.length}`);
       await load();
       return;

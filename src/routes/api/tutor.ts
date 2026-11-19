@@ -69,12 +69,30 @@ export const Route = createFileRoute("/api/tutor")({
 
         // Look up the student's preferred exam board(s)
         const { data: profile } = await sb.from("profiles").select("exam_boards").eq("id", userId).single();
-        const boards = body.board ? [body.board] : ((profile?.exam_boards as string[] | null) || ["both"]);
+        const reqBoard = body.board === "cambridge" || body.board === "edexcel" ? body.board : undefined;
+        const boards = reqBoard ? [reqBoard] : ((profile?.exam_boards as string[] | null) || ["both"]);
         const boardLabel = boards.includes("both") || boards.length > 1
           ? "Cambridge (CAIE) and Edexcel"
           : boards[0] === "cambridge" ? "Cambridge (CAIE)"
           : boards[0] === "edexcel" ? "Edexcel"
           : "Cambridge (CAIE) and Edexcel";
+
+        // Derive the topic context server-side from the caller's own conversation;
+        // never interpolate client-supplied text into the system prompt.
+        const { data: conv } = await sb
+          .from("tutor_conversations")
+          .select("id, topic_id")
+          .eq("id", body.conversationId)
+          .eq("user_id", userId)
+          .maybeSingle();
+        if (!conv) return new Response("Not found", { status: 404 });
+        let topicContext: string | undefined;
+        if (conv.topic_id) {
+          const { data: t } = await sb.from("topics").select("name, subjects(name)").eq("id", conv.topic_id).maybeSingle();
+          const subj = (t as { subjects?: { name?: string } | null } | null)?.subjects?.name;
+          if (t?.name) topicContext = subj ? `${subj} — ${t.name}` : t.name;
+        }
+        const paperFocus = (["mcq", "theory", "practical"] as const).includes(body.paperFocus as never) ? body.paperFocus : undefined;
 
         // Load history
         const { data: history } = await sb
@@ -93,7 +111,7 @@ export const Route = createFileRoute("/api/tutor")({
           content: body.userMessage,
         });
 
-        const systemPrompt = buildSystemPrompt(boardLabel, body.topicContext, body.paperFocus);
+        const systemPrompt = buildSystemPrompt(boardLabel, topicContext, paperFocus);
         const messages = [
           { role: "system", content: systemPrompt },
           ...(history || [])

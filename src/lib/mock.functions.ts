@@ -125,14 +125,10 @@ export const generateMockExam = createServerFn({ method: "POST" })
 /** Mark a photographed / scanned handwritten paper against the generated mark scheme. */
 export const markUploadedPaper = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { images: string[]; markScheme: Array<{ index: number; prompt: string; answer: string }> }) =>
+  .inputValidator((d: { images: string[]; questionIds: string[] }) =>
     z.object({
       images: z.array(z.string().startsWith("data:image/")).min(1).max(6),
-      markScheme: z.array(z.object({
-        index: z.number().int(),
-        prompt: z.string().min(1).max(4000),
-        answer: z.string().min(1).max(4000),
-      })).min(1).max(30),
+      questionIds: z.array(z.string().uuid()).min(1).max(30),
     }).parse(d)
   )
   .handler(async ({ data, context }) => {
@@ -143,8 +139,15 @@ export const markUploadedPaper = createServerFn({ method: "POST" })
       ? boardLabel(boards[0] as "cambridge" | "edexcel")
       : boardLabel("both");
 
-    const scheme = data.markScheme
-      .map((q) => `Q${q.index}. ${q.prompt}\nMARK SCHEME: ${q.answer}`)
+    // Mark scheme is loaded from the database, never trusted from the client.
+    const { data: qRows } = await supabase.from("quiz_questions").select("id, prompt, answer").in("id", data.questionIds).eq("user_id", userId);
+    const byId = new Map((qRows ?? []).map((q) => [q.id, q]));
+    const markScheme = data.questionIds
+      .map((id, i) => ({ index: i + 1, id, q: byId.get(id) }))
+      .filter((x): x is { index: number; id: string; q: { id: string; prompt: string; answer: string } } => !!x.q);
+    if (markScheme.length === 0) throw new Error("Questions not found");
+    const scheme = markScheme
+      .map((m) => `Q${m.index}. ${m.q.prompt}\nMARK SCHEME: ${m.q.answer}`)
       .join("\n\n");
 
     const apiKey = process.env["LOVABLE_API_KEY"]!;
@@ -205,8 +208,21 @@ export const markUploadedPaper = createServerFn({ method: "POST" })
     const json = await res.json();
     const args = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
     if (!args) throw new Error("Could not read the uploaded paper");
-    return JSON.parse(args) as {
+    const parsed = JSON.parse(args) as {
       results: Array<{ index: number; transcribed?: string; score: number; correct: boolean; feedback: string }>;
       overall?: string;
     };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const gradeRows = markScheme.map((m) => {
+      const r = parsed.results.find((x) => x.index === m.index);
+      const score = Math.min(1, Math.max(0, Number(r?.score) || 0));
+      return {
+        user_id: userId, question_id: m.id,
+        user_answer: (r?.transcribed || "(from uploaded script)").slice(0, 8000),
+        correct: !!r?.correct && score >= 0.5, score,
+        feedback: r?.feedback || "Not found in the uploaded pages.",
+      };
+    });
+    const { data: ins } = await supabaseAdmin.from("answer_grades").insert(gradeRows).select("id");
+    return { ...parsed, gradeIds: (ins ?? []).map((g) => g.id as string) };
   });

@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      answer_grades: {
+        Row: {
+          consumed_at: string | null
+          correct: boolean
+          created_at: string
+          feedback: string | null
+          id: string
+          question_id: string
+          score: number
+          user_answer: string
+          user_id: string
+        }
+        Insert: {
+          consumed_at?: string | null
+          correct: boolean
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          question_id: string
+          score: number
+          user_answer?: string
+          user_id: string
+        }
+        Update: {
+          consumed_at?: string | null
+          correct?: boolean
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          question_id?: string
+          score?: number
+          user_answer?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       attempt_answers: {
         Row: {
           ai_feedback: string | null
@@ -363,6 +399,7 @@ export type Database = {
           topic_id: string | null
           total: number
           user_id: string
+          verified: boolean
         }
         Insert: {
           duration_seconds?: number | null
@@ -375,6 +412,7 @@ export type Database = {
           topic_id?: string | null
           total?: number
           user_id: string
+          verified?: boolean
         }
         Update: {
           duration_seconds?: number | null
@@ -387,6 +425,7 @@ export type Database = {
           topic_id?: string | null
           total?: number
           user_id?: string
+          verified?: boolean
         }
         Relationships: [
           {
@@ -515,6 +554,7 @@ export type Database = {
           subject_id: string | null
           topic_id: string | null
           user_id: string
+          verified: boolean
         }
         Insert: {
           activity: string
@@ -525,6 +565,7 @@ export type Database = {
           subject_id?: string | null
           topic_id?: string | null
           user_id: string
+          verified?: boolean
         }
         Update: {
           activity?: string
@@ -535,6 +576,7 @@ export type Database = {
           subject_id?: string | null
           topic_id?: string | null
           user_id?: string
+          verified?: boolean
         }
         Relationships: [
           {
